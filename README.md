@@ -62,6 +62,8 @@
 
 NetScan-AI is a fork of [Sonar][sonar-url], an open-source desktop application for network traffic capture and flow matrix generation. It extends Sonar's solid capture engine with an integrated AI assistant and an interactive network graph.
 
+![NetScan-AI Screenshot](screen.png)
+
 **Key features:**
 
 ### AI Assistant
