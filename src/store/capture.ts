@@ -108,6 +108,7 @@ export const useCaptureConfigStore = defineStore("captureConfig", {
     chan_capacity: 1000,
     timeout: 25,
     snaplen: 65536,
+    activeFilter: "",
   }),
   actions: {
     updateConfig(

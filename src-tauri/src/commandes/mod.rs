@@ -1,3 +1,4 @@
+pub mod ai_proxy;
 pub mod export;
 pub mod flow_matrix;
 pub mod import;

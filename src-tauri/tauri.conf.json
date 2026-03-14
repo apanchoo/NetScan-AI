@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "sonar",
-  "version": "3.11.0",
-  "identifier": "fr.sonar.ssf",
+  "productName": "netscan-ai",
+  "version": "0.1.0",
+  "identifier": "io.netscanai.app",
   "build": {
     "beforeDevCommand": "deno task dev",
     "devUrl": "http://localhost:1420",
@@ -16,7 +16,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "SONAR",
+        "title": "NetScan-AI",
         "width": 1800,
         "height": 950,
         "create": false
@@ -24,12 +24,12 @@
     ]
   },
   "bundle": {
-    "homepage": "https://sonar-team.github.io/doc/",
+    "homepage": "https://github.com/apanchoo/NetScan-AI",
     "category": "Utility",
     "license": "AGPL-3.0",
-    "publisher": "avicocyprien@yahoo.com",
-    "shortDescription": "Outil de Relevé de matrice de flux",
-    "copyright": "avicocyprien@yahoo.com",
+    "publisher": "apanchoo",
+    "shortDescription": "AI-powered network traffic analyzer",
+    "copyright": "apanchoo",
     "active": true,
     "licenseFile": "../LICENSE.md",
     "targets": [
@@ -61,7 +61,7 @@
   },
   "plugins": {
     "cli": {
-      "description": "Sonar CLI",
+      "description": "NetScan-AI CLI",
       "args": [
         {
           "short": "H",

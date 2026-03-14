@@ -1,10 +1,10 @@
 [package]
-name = "sonar"
-version = "3.11.0"
-description = "A Tauri network analyzer App"
-authors = ["Cyprien Avico <avicocyprien@yahoo.com>"]
+name = "netscan-ai"
+version = "0.1.0"
+description = "AI-powered network traffic analyzer — fork of Sonar"
+authors = ["apanchoo"]
 edition = "2024"
-repository = "https://github.com/Sonar-team/Sonar_desktop_app"
+repository = "https://github.com/apanchoo/NetScan-AI"
 license = "AGPL-3.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -44,6 +44,7 @@ ouroboros = "0.18.5"
 
 libc = "0.2.182"
 tauri-plugin-fs = "2"
+reqwest = { version = "0.13", default-features = false, features = ["json"] }
 
 csv = "1.4.0"
 dirs = "6.0.0"
@@ -55,3 +56,6 @@ sysinfo = "0.38.3"
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-cli = "2"
 tauri-plugin-global-shortcut = "2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Storage_FileSystem"] }

@@ -1,9 +1,24 @@
 use std::sync::{Arc, Mutex};
 use tauri::{State, command};
 
-use crate::state::flow_matrix::FlowMatrix;
-// si tu veux un Result typé :
+use crate::state::flow_matrix::{FlowMatrix, FlowMatrixRow};
 use crate::errors::CaptureStateError;
+
+/// Returns up to `limit` flow rows sorted by packet count descending.
+/// limit = 0 means no limit (return everything).
+#[command]
+pub fn get_flow_matrix(
+    matrix: State<'_, Arc<Mutex<FlowMatrix>>>,
+    limit: usize,
+) -> Result<Vec<FlowMatrixRow>, CaptureStateError> {
+    let guard = matrix.lock()?;
+    let mut rows = guard.to_flat_vec();
+    rows.sort_by(|a, b| b.count.cmp(&a.count));
+    if limit > 0 && rows.len() > limit {
+        rows.truncate(limit);
+    }
+    Ok(rows)
+}
 
 #[command]
 pub fn add_label(

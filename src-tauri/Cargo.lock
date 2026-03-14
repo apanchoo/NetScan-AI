@@ -2271,6 +2271,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "netscan-ai"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "colored",
+ "crossbeam",
+ "csv",
+ "dirs",
+ "libc",
+ "log",
+ "ouroboros",
+ "packet_parser",
+ "parking_lot",
+ "pcap",
+ "rayon",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sysinfo",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-cli",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-log",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "thiserror 2.0.18",
+ "tokio",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
 name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3857,39 +3892,6 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "sonar"
-version = "3.11.0"
-dependencies = [
- "chrono",
- "colored",
- "crossbeam",
- "csv",
- "dirs",
- "libc",
- "log",
- "ouroboros",
- "packet_parser",
- "parking_lot",
- "pcap",
- "rayon",
- "serde",
- "serde_json",
- "sysinfo",
- "tauri",
- "tauri-build",
- "tauri-plugin-cli",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-log",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "thiserror 2.0.18",
- "tokio",
 ]
 
 [[package]]
