@@ -1,0 +1,10 @@
+# Gemini Code Assist configuration
+# https://developers.google.com/gemini-code-assist/docs/github-pullrequest-bot
+
+code_review:
+  comment_on_summary: true
+  comment_on_pr: true
+  pull_request_opened:
+    enabled: true
+  pull_request_synchronize:
+    enabled: true
