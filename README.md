@@ -262,7 +262,7 @@ Project Link: [https://github.com/apanchoo/NetScan-AI][repo-url]
 [stars-url]: https://github.com/apanchoo/NetScan-AI/stargazers
 [issues-shield]: https://img.shields.io/github/issues/apanchoo/NetScan-AI.svg?style=for-the-badge
 [issues-url]: https://github.com/apanchoo/NetScan-AI/issues
-[license-shield]: https://img.shields.io/github/license/apanchoo/NetScan-AI.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/badge/license-AGPL--3.0-blue?style=for-the-badge
 [license-url]: https://github.com/apanchoo/NetScan-AI/blob/main/LICENSE.md
 [repo-url]: https://github.com/apanchoo/NetScan-AI
 [sonar-url]: https://github.com/Sonar-team/Sonar_desktop_app
