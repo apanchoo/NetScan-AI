@@ -12,7 +12,7 @@
         </div>
 
         <div class="quit-body">
-          <p id="quit-title" class="quit-title">Quitter Sonar ?</p>
+          <p id="quit-title" class="quit-title">Quitter NetScan-AI ?</p>
           <p class="quit-sub">Les données non sauvegardées seront perdues.</p>
         </div>
 

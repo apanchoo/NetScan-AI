@@ -56,7 +56,7 @@
             </div>
             <p class="cap-hint">
               Sur NixOS : remplacez <code>nom_du_binaire</code> par
-              <code>target/debug/sonar</code> ou le chemin du binaire compilé.
+              <code>target/debug/netscan-ai</code> ou le chemin du binaire compilé.
             </p>
           </div>
 

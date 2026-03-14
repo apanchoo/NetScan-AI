@@ -7,6 +7,7 @@
     <!-- Start -->
     <button class="image-btn logo-btn" @click="start" title="Démarrer (ctrl+p)" :disabled="isRunning">
       <img src="/src-tauri/icons/StoreLogo.png" alt="Sonar" class="logo-img" />
+      <span v-if="isRecording" class="rec-dot" />
     </button>
 
     <!-- Stop -->
@@ -32,14 +33,23 @@
       </svg>
     </button>
 
-    <!-- Save -->
-    <button class="image-btn" @click="triggerSave" title="Sauvegarder (ctrl+s)">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2.5 13.5h11V5l-3-3H2.5v11.5z"/>
-        <rect x="5" y="9" width="6" height="4.5" rx="0.5"/>
-        <rect x="5.5" y="2.5" width="4" height="3" rx="0.5"/>
-      </svg>
-    </button>
+    <!-- Save dropdown (CSV / PNG) -->
+    <div class="export-wrap">
+      <button class="image-btn" @click="showSaveMenu = !showSaveMenu" title="Sauvegarder (ctrl+s)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.5 13.5h11V5l-3-3H2.5v11.5z"/>
+          <rect x="5" y="9" width="6" height="4.5" rx="0.5"/>
+          <rect x="5.5" y="2.5" width="4" height="3" rx="0.5"/>
+        </svg>
+      </button>
+      <Transition name="menu-fade">
+        <div v-if="showSaveMenu" class="export-menu">
+          <button @click="triggerSave">Exporter CSV</button>
+          <button @click="triggerSavePng">Exporter PNG</button>
+          <button @click="triggerSaveSvg">Exporter SVG</button>
+        </div>
+      </Transition>
+    </div>
 
     <!-- Open -->
     <button class="image-btn" @click="displayPcapOpener" title="Ouvrir (ctrl+o)">
@@ -75,6 +85,24 @@
       </svg>
     </button>
 
+    <!-- Export rules dropdown -->
+    <div class="export-wrap">
+      <button class="image-btn" @click="showExportMenu = !showExportMenu" title="Exporter des règles">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 2v8M5 7l3 3 3-3"/>
+          <path d="M3 12h10"/>
+          <path d="M11 9.5l2 2-2 2"/>
+        </svg>
+      </button>
+      <Transition name="menu-fade">
+        <div v-if="showExportMenu" class="export-menu">
+          <button @click="exportRules('snort')">Snort</button>
+          <button @click="exportRules('suricata')">Suricata</button>
+          <button @click="exportRules('iptables')">iptables</button>
+        </div>
+      </Transition>
+    </div>
+
     <div class="sep"/>
 
     <!-- Quit -->
@@ -90,7 +118,7 @@
     </div><!-- end bar-left -->
 
     <!-- Title centered — drag region -->
-    <div class="bar-title" @mousedown="onDragStart">SONAR</div>
+    <div class="bar-title" @mousedown="onDragStart">NetScan-AI</div>
 
     <!-- Window controls: right side -->
     <div class="bar-right">
@@ -125,6 +153,7 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { exit } from '@tauri-apps/plugin-process';
 import { info, error } from '@tauri-apps/plugin-log';
 import { save } from '@tauri-apps/plugin-dialog';
+import { downloadDir } from '@tauri-apps/api/path';
 import { register, unregister } from '@tauri-apps/plugin-global-shortcut';
 // when using `"withGlobalTauri": true`, you may use
 // const { register } = window.__TAURI__.globalShortcut;
@@ -163,10 +192,17 @@ export default {
       showMatrice: true,
       shortcuts: [] as string[],
       isMaximized: false,
+      isRecording: false,
+      showSaveMenu: false,
+      showExportMenu: false,
+      _closeMenu: null as null | (() => void),
     };
   },
   async mounted() {
     appWindow = getCurrentWebviewWindow();
+    const closeMenu = () => { this.showExportMenu = false; this.showSaveMenu = false; };
+    document.addEventListener('click', closeMenu, true);
+    this._closeMenu = closeMenu;
     this.isMaximized = await appWindow.isMaximized();
     await appWindow.onResized(async () => {
       this.isMaximized = await appWindow!.isMaximized();
@@ -204,8 +240,8 @@ export default {
   },
 
   async beforeUnmount() {
-  // recommandé en dev/hot reload
     await this.unbindAllShortcuts();
+    if (this._closeMenu) document.removeEventListener('click', this._closeMenu, true);
   },
   methods: {
     bindShortcut(shortcut: string, handler: () => void) {
@@ -289,9 +325,16 @@ export default {
       }
     },
     async triggerSave() {
-      info("trigger save")
+      this.showSaveMenu = false;
       this.SaveAsCsv();
-      
+    },
+    triggerSavePng() {
+      this.showSaveMenu = false;
+      document.dispatchEvent(new CustomEvent('export-png'));
+    },
+    triggerSaveSvg() {
+      this.showSaveMenu = false;
+      document.dispatchEvent(new CustomEvent('export-svg'));
     },
     async reset() {
       info("reset")
@@ -316,13 +359,52 @@ export default {
       info("[TopBar] Bouton IA cliqué");
       this.$emit('toggle-ai');
     },
-    async start() {
-      if (this.captureStore.isRunning) {
-        return;
-      }
-      const onEvent = new Channel<CaptureEvent>();
-      this.captureStore.setChannel(onEvent); // 🟢 rendre le Channel accessible
 
+    async startPcapRecord() {
+      this.showSaveMenu = false;
+      const path = await save({
+        filters: [{ name: 'PCAP', extensions: ['pcap'] }],
+        title: 'Enregistrer en PCAP',
+        defaultPath: getCurrentDate() + '_capture.pcap',
+      });
+      if (!path) return;
+      await invoke('start_pcap_record', { path }).catch((e: any) => error('start_pcap_record:', e));
+      this.isRecording = true;
+    },
+
+    async stopPcapRecord() {
+      this.showSaveMenu = false;
+      const path = await invoke<string>('stop_pcap_record').catch((e: any) => { error('stop_pcap_record:', e); return null });
+      this.isRecording = false;
+      if (path) info('PCAP enregistré : ' + path);
+    },
+
+    async exportRules(type: 'snort' | 'suricata' | 'iptables') {
+      this.showExportMenu = false;
+      const ext = type === 'iptables' ? 'sh' : 'rules';
+      const path = await save({
+        filters: [{ name: type, extensions: [ext] }],
+        title: `Exporter règles ${type}`,
+        defaultPath: `${getCurrentDate()}_${type}.${ext}`,
+      });
+      if (!path) return;
+      const cmd = type === 'snort' ? 'export_snort_rules'
+                : type === 'suricata' ? 'export_suricata_rules'
+                : 'export_iptables';
+      await invoke(cmd, { path }).catch((e: any) => error(`${cmd}:`, e));
+      info(`Règles ${type} exportées : ${path}`);
+    },
+    async start() {
+      if (this.captureStore.isRunning) return;
+
+      const dir = await downloadDir().catch(() => '.');
+      const pcapPath = `${dir}/${getCurrentDate()}_capture.pcap`;
+      await invoke('start_pcap_record', { path: pcapPath })
+        .then(() => { this.isRecording = true; info('Enregistrement PCAP : ' + pcapPath); })
+        .catch((e: any) => error('start_pcap_record:', e));
+
+      const onEvent = new Channel<CaptureEvent>();
+      this.captureStore.setChannel(onEvent);
       await invoke('start_capture', { onEvent })
         .then((status) => {
           const typedStatus = status as { is_running: boolean };
@@ -332,17 +414,22 @@ export default {
         .catch(displayCaptureError);
     },
     async stop() {
-      if (!this.captureStore.isRunning) {
-        return;
-      }
+      if (!this.captureStore.isRunning) return;
+
       const onEvent = this.captureStore.getChannel();
-      await invoke('stop_capture',{ onEvent })
+      await invoke('stop_capture', { onEvent })
         .then((status) => {
           const typedStatus = status as { is_running: boolean };
           this.captureStore.updateStatus(typedStatus);
           info('Capture arrêtée : ' + this.captureStore.isRunning);
         })
         .catch(displayCaptureError);
+
+      if (this.isRecording) {
+        await invoke<string>('stop_pcap_record')
+          .then((path) => { this.isRecording = false; info('PCAP enregistré : ' + path); })
+          .catch((e: any) => error('stop_pcap_record:', e));
+      }
     },
     toggleView() {
       info('Vue basculée');
@@ -494,6 +581,7 @@ export default {
 .logo-btn {
   padding: 3px;
   margin-right: 4px;
+  position: relative;
 }
 
 .logo-img {
@@ -527,5 +615,73 @@ export default {
 .ai-btn-active:hover {
   color: #a0a0e8;
   background-color: #35355a;
+}
+
+.rec-dot {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e05555;
+  animation: rec-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes rec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Export rules dropdown */
+.export-wrap {
+  position: relative;
+}
+
+.export-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #2c2c3a;
+  border: 1px solid #3c3c50;
+  border-radius: 6px;
+  padding: 4px 0;
+  min-width: 120px;
+  z-index: 10000;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.export-menu button {
+  display: block;
+  width: 100%;
+  padding: 6px 14px;
+  background: transparent;
+  border: none;
+  color: #a0a0b8;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.export-menu button:hover {
+  background: #383850;
+  color: #d4d4d8;
+}
+
+.export-menu button.record-item {
+  color: #e05555;
+}
+.export-menu button.record-item:hover {
+  background: #3a2020;
+  color: #f07070;
+}
+
+.menu-fade-enter-active, .menu-fade-leave-active {
+  transition: opacity 0.12s ease, transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.menu-fade-enter-from, .menu-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>
