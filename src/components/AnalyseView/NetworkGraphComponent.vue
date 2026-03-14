@@ -68,17 +68,17 @@ const OUI_MAP: Record<string, string> = {
 }
 
 const DEVICE_TYPE_LABELS: Record<string, string> = {
-  router:   "Routeur / Switch",
-  server:   "Serveur",
-  computer: "Ordinateur / PC",
-  phone:    "Mobile / Tablette",
-  apple:    "Appareil Apple",
-  windows:  "PC Windows",
+  router:   "Router / Switch",
+  server:   "Server",
+  computer: "Computer / PC",
+  phone:    "Mobile / Tablet",
+  apple:    "Apple Device",
+  windows:  "Windows PC",
   linux:    "Linux / Raspberry Pi",
-  printer:  "Imprimante",
-  vm:       "Machine virtuelle",
+  printer:  "Printer",
+  vm:       "Virtual Machine",
   internet: "Internet",
-  unknown:  "Inconnu",
+  unknown:  "Unknown",
 }
 
 function isPrivateIp(ip: string): boolean {
@@ -348,7 +348,7 @@ export default defineComponent({
     })
 
     this.captureStore.onGraphSnapshot((graphData) => {
-      console.log("[NetworkGraphComponent] GraphSnapshot reçu -> reload");
+      console.log("[NetworkGraphComponent] GraphSnapshot received -> reload");
       this.loadFromGraphData(graphData);
     });
 
@@ -381,12 +381,12 @@ export default defineComponent({
      * envoyé par le backend (GraphSnapshot).
      */
 async loadFromGraphData(snapshot: GraphData | null | undefined) {
-  console.log("[NetworkGraphComponent] GraphSnapshot reçu -> ", snapshot);
+  console.log("[NetworkGraphComponent] GraphSnapshot received -> ", snapshot);
 
   try {
     // 1. Input validation
     if (!snapshot) {
-      console.error("[NetworkGraphComponent] Aucune donnée reçue");
+      console.error("[NetworkGraphComponent] No data received");
       return;
     }
 
@@ -405,7 +405,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
 
     // 3. Process nodes
     const nodeEntries = Object.entries(snapshot.nodes || {});
-    console.log(`[NetworkGraphComponent] Chargement de ${nodeEntries.length} nœuds`);
+    console.log(`[NetworkGraphComponent] Loading ${nodeEntries.length} nodes`);
 
     for (const [nodeId, node] of nodeEntries) {
       if (!node) continue;
@@ -426,13 +426,13 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
           _hover: brighten(color, 0.18),
         };
       } catch (error) {
-        console.error(`[NetworkGraphComponent] Erreur lors du chargement du nœud ${nodeId}:`, error);
+        console.error(`[NetworkGraphComponent] Error loading node ${nodeId}:`, error);
       }
     }
 
     // 4. Process edges
     const edgeEntries = Object.entries(snapshot.edges || {});
-    console.log(`[NetworkGraphComponent] Chargement de ${edgeEntries.length} arêtes`);
+    console.log(`[NetworkGraphComponent] Loading ${edgeEntries.length} edges`);
 
     for (const [edgeId, edge] of edgeEntries) {
       if (!edge) continue;
@@ -443,12 +443,12 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
         const label = edge.label || "";
 
         if (!source || !target) {
-          console.warn(`[NetworkGraphComponent] Arête ${edgeId} invalide: source ou target manquante`);
+          console.warn(`[NetworkGraphComponent] Invalid edge ${edgeId}: source or target missing`);
           continue;
         }
 
         if (!this.graphData.nodes[source] || !this.graphData.nodes[target]) {
-          console.warn(`[NetworkGraphComponent] Arête orpheline ignorée: ${source} -> ${target} (${label})`);
+          console.warn(`[NetworkGraphComponent] Orphan edge ignored: ${source} -> ${target} (${label})`);
           continue;
         }
 
@@ -471,7 +471,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
           _color,
         };
       } catch (error) {
-        console.error(`[NetworkGraphComponent] Erreur lors du chargement de l'arête ${edgeId}:`, error);
+        console.error(`[NetworkGraphComponent] Error loading edge ${edgeId}:`, error);
       }
     }
 
@@ -480,12 +480,12 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       try {
         this.forceLayout.start();
       } catch (error) {
-        console.error("[NetworkGraphComponent] Erreur lors du démarrage du layout:", error);
+        console.error("[NetworkGraphComponent] Error starting layout:", error);
       }
     }
 
   } catch (error) {
-    console.error("[NetworkGraphComponent] Erreur critique dans loadFromGraphData:", error);
+    console.error("[NetworkGraphComponent] Critical error in loadFromGraphData:", error);
   }
 }
 ,
@@ -512,7 +512,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       const newLabel = String(this.editedLabel ?? "").trim()
       const newDeviceType = this.editedDeviceType || undefined
 
-      // Remplacer le nœud entier pour déclencher shallowReactive
+      // Replace entire node to trigger shallowReactive
       const updated: NodeData = { ...this.selectedNode, label: newLabel, deviceType: newDeviceType }
       this.graphData.nodes[this.selectedNodeId] = updated
       this.selectedNode = updated
@@ -528,7 +528,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
           label: newLabel,
         })
       } catch (e) {
-        console.error("Erreur add_label:", e)
+        console.error("Error add_label:", e)
       } finally {
         this.isSavingLabel = false
       }
@@ -551,7 +551,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
     // === Bandeau infos =====================================================
     _buildNodeInfos(nodeId: string): string[] {
       const n = this.graphData.nodes[nodeId] as any
-      if (!n) return ["Nœud introuvable"]
+      if (!n) return ["Node not found"]
 
       let degree = 0
       const protos = new Set<string>()
@@ -568,14 +568,14 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
 
       return [
         `ID: ${n.id}`,
-        `Nom: ${n.name ?? ""}`,
+        `Name: ${n.name ?? ""}`,
         `Label: ${n.label ?? "N/A"}`,
         `Type: ${dtypeLabel}`,
         `MAC: ${n.mac ?? ""}`,
         `IP: ${n.ip ?? ""}`,
-        `Couleur: ${n.color}`,
-        `Degré: ${degree}`,
-        `Protocoles: ${[...protos].join(", ") || "—"}`,
+        `Color: ${n.color}`,
+        `Degree: ${degree}`,
+        `Protocols: ${[...protos].join(", ") || "—"}`,
       ]
     },
 
@@ -602,7 +602,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
         const vng = (this.$refs as any).graphnodes
         const text = await vng.exportAsSvgText({ embedImages: true })
         await writeTextFile(filePath, text)
-        console.log(`SVG exporté dans ${filePath}`)
+        console.log(`SVG exported to ${filePath}`)
       },
       async downloadPng() {
       const filePath = await save({
@@ -618,7 +618,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       const pngBytes = await svgTextToPngBytes(svgText, { scale: 2, background: "white" })
 
       await writeFile(filePath, pngBytes)
-      console.log(`PNG exporté dans ${filePath}`)
+      console.log(`PNG exported to ${filePath}`)
     },
 
 
@@ -704,7 +704,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
         class="graph-btn"
         :class="{ active: forceEnabled }"
         @click="toggleForce"
-        :title="forceEnabled ? 'Désactiver la gravité' : 'Activer la gravité'"
+        :title="forceEnabled ? 'Disable gravity' : 'Enable gravity'"
       >
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="8" cy="5" r="2.5"/>
@@ -859,7 +859,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
     <div class="bottom-info">
       <div class="zoom">Zoom: {{ zoomLevel.toPrecision(2) }}</div>
       <div class="sep" />
-      <button class="inline-btn" @click="printLabels" title="Afficher les labels">
+      <button class="inline-btn" @click="printLabels" title="Show labels">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
           <circle cx="4" cy="7" r="1.5"/>
           <circle cx="7" cy="3.5" r="1.5"/>
@@ -870,19 +870,19 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       </button>
       <div class="sep" />
       <div class="node-infos" v-if="selectedNodeInfos.length">
-        <strong>Nœud sélectionné</strong>
+        <strong>Selected node</strong>
 
-        <!-- Édition du label et du type -->
+        <!-- Label and type editing -->
         <div class="edit-row">
-          <label for="labelInput">Label :</label>
+          <label for="labelInput">Label:</label>
           <input
             id="labelInput"
             v-model="editedLabel"
             type="text"
-            placeholder="Entrer un label…"
+            placeholder="Enter a label…"
             @keydown="onEditKeydown"
           />
-          <label for="deviceTypeSelect">Type :</label>
+          <label for="deviceTypeSelect">Type:</label>
           <select id="deviceTypeSelect" v-model="editedDeviceType" class="device-select">
             <option v-for="(label, value) in deviceTypeLabels" :key="value" :value="value">{{ label }}</option>
           </select>
@@ -890,20 +890,19 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
             class="primary"
             :disabled="isSavingLabel || !selectedNode"
             @click="editNodeLabel"
-            title="Valider la modification"
+            title="Save changes"
           >
-            {{ isSavingLabel ? "Enregistrement…" : "Enregistrer" }}
+            {{ isSavingLabel ? "Saving…" : "Save" }}
           </button>
-          <button class="ghost" @click="clearNodeInfos" :disabled="isSavingLabel">Annuler</button>
+          <button class="ghost" @click="clearNodeInfos" :disabled="isSavingLabel">Cancel</button>
         </div>
 
         <ul>
-          infos : 
           <li v-for="(info, idx) in selectedNodeInfos" :key="idx">{{ info }}</li>
         </ul>
       </div>
       <div class="node-infos hint" v-else>
-        Clique sur un nœud pour afficher ses informations.
+        Click on a node to display its information.
       </div>
       
     </div>

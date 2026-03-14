@@ -12,20 +12,20 @@
           <span>NetScan-AI</span>
         </div>
         <div class="header-actions">
-          <button class="icon-btn" title="Reconfigurer l'IA" @click="reconfigure">
+          <button class="icon-btn" title="Reconfigure AI" @click="reconfigure">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
               <circle cx="8" cy="8" r="2"/>
               <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M11.9 4.1l-.7.7M4.8 11.2l-.7.7"/>
             </svg>
           </button>
-          <button class="icon-btn" title="Vider le chat" @click="clearChat">
+          <button class="icon-btn" title="Clear chat" @click="clearChat">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 4 4 4 13 4"/>
               <path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M10 8v5"/>
               <path d="M4 4l.5 8.5a1 1 0 0 0 1 .5h5a1 1 0 0 0 1-.5L12 4"/>
             </svg>
           </button>
-          <button class="icon-btn close-btn" title="Fermer" @click="$emit('close')">
+          <button class="icon-btn close-btn" title="Close" @click="$emit('close')">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
               <line x1="4" y1="4" x2="12" y2="12"/>
               <line x1="12" y1="4" x2="4" y2="12"/>
@@ -41,19 +41,19 @@
           <path d="M4 28c0-6.6 5.4-10 12-10s12 3.4 12 10"/>
           <path d="M22 9c1.6.8 3 2.4 3 5"/>
         </svg>
-        <p>Configure ton fournisseur d'IA pour utiliser l'assistant.</p>
-        <button class="configure-btn" @click="reconfigure">Configurer l'IA</button>
+        <p>Configure your AI provider to use the assistant.</p>
+        <button class="configure-btn" @click="reconfigure">Configure AI</button>
       </div>
 
       <!-- Chat messages -->
       <div v-else class="messages" ref="messagesEl">
         <div v-if="messages.length === 0" class="empty-state">
-          <p>Salut ! Je peux t'aider à contrôler NetScan-AI en langage naturel.</p>
+          <p>Hi! I can help you control NetScan-AI using natural language.</p>
           <div class="suggestions">
-            <button class="suggestion" @click="sendSuggestion('Démarre la capture')">Démarre la capture</button>
-            <button class="suggestion" @click="sendSuggestion('Filtre uniquement le trafic TCP')">Filtre TCP seulement</button>
-            <button class="suggestion" @click="sendSuggestion('Quel est le statut actuel ?')">Statut actuel</button>
-            <button class="suggestion" @click="sendSuggestion('Réinitialise les données')">Réinitialiser</button>
+            <button class="suggestion" @click="sendSuggestion('Start capture')">Start capture</button>
+            <button class="suggestion" @click="sendSuggestion('Filter TCP traffic only')">Filter TCP only</button>
+            <button class="suggestion" @click="sendSuggestion('What is the current status?')">Current status</button>
+            <button class="suggestion" @click="sendSuggestion('Reset data')">Reset</button>
           </div>
         </div>
 
@@ -88,7 +88,7 @@
         <textarea
           ref="inputEl"
           v-model="inputText"
-          placeholder="Envoie une commande en langage naturel..."
+          placeholder="Send a natural language command..."
           rows="1"
           :disabled="loading"
           @keydown.enter.exact.prevent="sendMessage"
@@ -122,12 +122,12 @@ interface DisplayMessage {
 }
 
 const ACTION_LABELS: Record<string, string> = {
-  start_capture: 'Capture démarrée',
-  stop_capture: 'Capture arrêtée',
-  reset_capture: 'Données réinitialisées',
-  set_filter: 'Filtre appliqué',
-  export_csv: 'Export CSV',
-  get_status: 'Statut récupéré',
+  start_capture: 'Capture started',
+  stop_capture: 'Capture stopped',
+  reset_capture: 'Data reset',
+  set_filter: 'Filter applied',
+  export_csv: 'CSV exported',
+  get_status: 'Status retrieved',
 }
 
 export default defineComponent({
@@ -206,7 +206,7 @@ export default defineComponent({
         const msg = typeof err === 'string'
           ? err
           : (err?.message ?? JSON.stringify(err) ?? String(err))
-        this.messages[assistantIdx].content = `Erreur : ${msg}`
+        this.messages[assistantIdx].content = `Error: ${msg}`
         this.messages[assistantIdx].streaming = false
       }
 

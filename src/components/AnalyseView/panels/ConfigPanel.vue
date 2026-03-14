@@ -9,9 +9,9 @@
             <circle cx="8" cy="8" r="2"/>
             <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M11.9 4.1l-.7.7M4.8 11.2l-.7.7"/>
           </svg>
-          Configuration capture
+          Capture settings
         </div>
-        <button class="close-btn" @click="close" title="Fermer">
+        <button class="close-btn" @click="close" title="Close">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <line x1="4" y1="4" x2="12" y2="12"/>
             <line x1="12" y1="4" x2="4" y2="12"/>
@@ -32,12 +32,12 @@
 
         <!-- Numeric fields -->
         <div class="field">
-          <label class="field-label">Taille du buffer</label>
+          <label class="field-label">Buffer size</label>
           <input class="field-input" type="number" v-model.number="bufferSize" />
         </div>
 
         <div class="field">
-          <label class="field-label">Nombre de buffers</label>
+          <label class="field-label">Buffer count</label>
           <input class="field-input" type="number" v-model.number="chan_capacity" />
         </div>
 
@@ -55,12 +55,12 @@
 
       <!-- Footer -->
       <div class="panel-footer">
-        <button class="btn-ghost" @click="close">Annuler</button>
+        <button class="btn-ghost" @click="close">Cancel</button>
         <button class="btn-primary" @click="save">
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 7h10M8 3l4 4-4 4"/>
           </svg>
-          Sauvegarder
+          Save
         </button>
       </div>
 
@@ -105,7 +105,7 @@ export default {
         this.snaplen = config.snaplen;
         this.configStore.updateConfig(config);
       } catch (err) {
-        console.error("[ConfigPanel] erreur get_config_capture :", err);
+        console.error("[ConfigPanel] error get_config_capture:", err);
       }
     },
 
@@ -130,7 +130,7 @@ export default {
         this.snaplen = config.snaplen;
         this.configStore.updateConfig(config);
       } catch (err) {
-        console.error("[ConfigPanel] erreur config_capture :", err);
+        console.error("[ConfigPanel] error config_capture:", err);
       }
       this.close();
     },

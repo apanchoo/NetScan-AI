@@ -1,21 +1,21 @@
 <template>
   <div class="legend-container">
-    <h3>Légende</h3>
-    
+    <h3>Legend</h3>
+
     <div class="legend-section">
-      <h4>Couleurs des nœuds</h4>
+      <h4>Node colors</h4>
       <div class="legend-item">
         <div class="color-box" style="background-color: #4a6aa0;"></div>
-        <span>@IP Publique</span>
+        <span>Public IP</span>
       </div>
       <div class="legend-item">
         <div class="color-box" style="background-color: #487048;"></div>
-        <span>@IP Privée</span>
+        <span>Private IP</span>
       </div>
     </div>
 
     <div class="legend-section">
-      <h4>Couleurs des arêtes (protocoles)</h4>
+      <h4>Edge colors (protocols)</h4>
       <div class="legend-item">
         <div class="color-box edge-color" style="background-color: #a89040;"></div>
         <span>ARP</span>
@@ -42,19 +42,19 @@
       </div>
       <div class="legend-item">
         <div class="color-box edge-color" style="background-color: #808095;"></div>
-        <span>Autre</span>
+        <span>Other</span>
       </div>
     </div>
 
     <div class="legend-section">
-      <h4>Style des arêtes</h4>
+      <h4>Edge style</h4>
       <div class="legend-item">
         <div class="edge-line"></div>
-        <span>Connexion simple</span>
+        <span>One-way connection</span>
       </div>
       <div class="legend-item">
         <div class="edge-line bidirectional"></div>
-        <span>Connexion bidirectionnelle</span>
+        <span>Bidirectional connection</span>
       </div>
     </div>
   </div>

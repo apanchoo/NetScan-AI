@@ -29,33 +29,33 @@ export async function displayCaptureError(err: unknown) {
   const captureError = err as CaptureStateErrorKind;
 
   if (!("kind" in captureError)) {
-    showError("Erreur Capture", "unknown", "Erreur inconnue.", JSON.stringify(err));
-    error(`Erreur Capture inconnue : ${JSON.stringify(err)}`);
+    showError("Capture Error", "unknown", "Unknown error.", JSON.stringify(err));
+    error(`Unknown capture error: ${JSON.stringify(err)}`);
     return;
   }
 
   switch (captureError.kind) {
     case "io":
-      showError("Erreur Capture", "io", "Erreur d'entrée/sortie.", captureError.message);
+      showError("Capture Error", "io", "I/O error.", captureError.message);
       break;
     case "poisonError":
-      showError("Erreur Capture", "poisonError", "Erreur verrou interne.", captureError.message);
+      showError("Capture Error", "poisonError", "Internal lock error.", captureError.message);
       break;
     case "capture": {
       const captureKind = captureError.message as CaptureErrorKind;
       if ("kind" in captureKind) {
         switch (captureKind.kind) {
           case "interfaceNotFound":
-            showError("Erreur Capture", "interfaceNotFound", "Interface réseau introuvable.", captureKind.message);
+            showError("Capture Error", "interfaceNotFound", "Network interface not found.", captureKind.message);
             break;
           case "deviceListError":
-            showError("Erreur Capture", "deviceListError", "Impossible de lister les interfaces réseau.", captureKind.message);
+            showError("Capture Error", "deviceListError", "Unable to list network interfaces.", captureKind.message);
             break;
           case "captureInitError":
-            showError("Erreur Capture", "captureInitError", "Échec de l'initialisation de la capture.", captureKind.message);
+            showError("Capture Error", "captureInitError", "Capture initialization failed.", captureKind.message);
             break;
           case "channelSendError":
-            showError("Erreur Capture", "channelSendError", "Erreur d'envoi sur le canal de capture.", captureKind.message);
+            showError("Capture Error", "channelSendError", "Error sending on capture channel.", captureKind.message);
             break;
         }
       }
@@ -63,34 +63,34 @@ export async function displayCaptureError(err: unknown) {
     }
     case "import": {
       const importKind = captureError.message as ImportErrorKind;
-      showError("Erreur Import", importKind?.kind ?? "import", handleImportError(importKind));
+      showError("Import Error", importKind?.kind ?? "import", handleImportError(importKind));
       break;
     }
     case "other":
-      showError("Erreur", "other", "Erreur inattendue.", captureError.message);
+      showError("Error", "other", "Unexpected error.", captureError.message);
       break;
   }
 
-  error(`Erreur Capture (${captureError.kind})`);
+  error(`Capture error (${captureError.kind})`);
 }
 
 function handleImportError(importError: ImportErrorKind): string {
   if (
     !importError || typeof importError !== "object" || !("kind" in importError)
   ) {
-    return `Erreur d'import inconnue : ${JSON.stringify(importError)}`;
+    return `Unknown import error: ${JSON.stringify(importError)}`;
   }
 
   switch (importError.kind) {
     case "openFileError":
-      return `Impossible d'ouvrir le fichier ${importError.file} : ${importError.message}`;
+      return `Unable to open file ${importError.file}: ${importError.message}`;
     case "invalidPacket":
-      return `Paquet invalide : ${importError.message}`;
+      return `Invalid packet: ${importError.message}`;
     case "parseError":
-      return `Erreur d'analyse : ${importError.message}`;
+      return `Parse error: ${importError.message}`;
     case "other":
-      return `Erreur d'import : ${importError.message}`;
+      return `Import error: ${importError.message}`;
     default:
-      return `Erreur d'import inconnue : ${JSON.stringify(importError)}`;
+      return `Unknown import error: ${JSON.stringify(importError)}`;
   }
 }

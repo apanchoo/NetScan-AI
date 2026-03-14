@@ -5,16 +5,16 @@
         <tr>
           <th>MAC S</th>
           <th>MAC D</th>
-          <th>Vlan</th>
+          <th>VLAN</th>
           <th>Protocol</th>
-          <th>IP S</th>
-          <th>IP D</th>
+          <th>Src IP</th>
+          <th>Dst IP</th>
           <th>Transport</th>
-          <th>Port S</th>
-          <th>Port D</th>
+          <th>Src Port</th>
+          <th>Dst Port</th>
           <th>Application</th>
-          <th>Taille</th>
-          <th>Heure</th>
+          <th>Size</th>
+          <th>Time</th>
         </tr>
       </thead>
       <tbody ref="tbodyEl">
@@ -48,58 +48,59 @@ export default defineComponent({
       packets: [] as PacketMinimal[],
       offPacket: null as null | (() => void),
       resetHandler: null as null | (() => void),
-      MAX_ROWS: 500,
       autoScroll: true,
+      _buffer: [] as PacketMinimal[],  // non-reactive buffer
+      _raf: 0,
     }
-  },
-  watch: {
-    safePackets() {
-      this.$nextTick(() => this.scrollToBottom())
-    },
   },
   computed: {
     captureStore() {
       return useCaptureStore()
     },
-    // Ne conserve que des objets valides et limite l'affichage
     safePackets(): PacketMinimal[] {
-      const arr = this.packets.filter((p) => !!p && typeof p === 'object')
-      return arr.slice(Math.max(0, arr.length - this.MAX_ROWS))
+      return this.packets
     },
   },
   mounted() {
-    // Abonnement aux paquets
+    // Subscribe to packets — accumulate in non-reactive buffer
     const onPacket = (packet: PacketMinimal | undefined | null) => {
       if (!packet || typeof packet !== 'object') return
-      this.packets.push(packet)
-      // garde une taille raisonnable même en interne
-      if (this.packets.length > 200) this.packets.shift()
+      this._buffer.push(packet)
+      if (!this._raf) {
+        this._raf = requestAnimationFrame(() => {
+          if (this._buffer.length === 0) { this._raf = 0; return }
+          for (const p of this._buffer) this.packets.push(p)
+          this._buffer = []
+          if (this.packets.length > 500) this.packets.splice(0, this.packets.length - 500)
+          this._raf = 0
+          this.$nextTick(() => this.scrollToBottom())
+        })
+      }
     }
     const maybeOff = this.captureStore.onPacket(onPacket)
-    if (typeof maybeOff === ‘function’) this.offPacket = maybeOff
+    if (typeof maybeOff === 'function') this.offPacket = maybeOff
 
-    // Pause auto-scroll si l’utilisateur remonte
+    // Pause auto-scroll when user scrolls up
     const tbody = this.$refs.tbodyEl as HTMLElement | undefined
     if (tbody) {
-      tbody.addEventListener(‘scroll’, () => {
+      tbody.addEventListener('scroll', () => {
         const atBottom = tbody.scrollHeight - tbody.scrollTop - tbody.clientHeight < 32
         this.autoScroll = atBottom
       })
     }
 
-    // Handler reset conservé pour off() symétrique si nécessaire
-    const reset = () => { this.packets = [] }
+    const reset = () => { this.packets = []; this._buffer = [] }
     this.resetHandler = reset
     this.$bus?.on?.('reset', reset)
   },
   beforeUnmount() {
+    if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0 }
     if (this.offPacket) {
       try { this.offPacket() } catch {}
     }
     if (this.resetHandler) {
       this.$bus?.off?.('reset', this.resetHandler)
     } else {
-      // fallback si ton bus accepte off(event) sans callback
       this.$bus?.off?.('reset')
     }
   },
@@ -113,7 +114,7 @@ export default defineComponent({
       if (typeof sec !== 'number' || typeof usec !== 'number') return '-'
       const date = new Date(sec * 1000 + Math.floor(usec / 1000))
       try {
-        return date.toLocaleTimeString('fr-FR', {
+        return date.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit',
@@ -122,7 +123,7 @@ export default defineComponent({
       } catch {
         // older runtimes sans fractionalSecondDigits
         const ms = String(Math.floor((usec % 1_000_000) / 1000)).padStart(3, '0')
-        const base = date.toLocaleTimeString('fr-FR', { hour12: false })
+        const base = date.toLocaleTimeString('en-US', { hour12: false })
         return `${base}.${ms}`
       }
     },

@@ -1,6 +1,6 @@
 <template>
   <div class="interface-selector">
-    <label class="field-label">Interface réseau</label>
+    <label class="field-label">Network interface</label>
 
     <select
       v-model="selectedInterface"
@@ -8,7 +8,7 @@
       class="field-select"
       :disabled="netInterfaces.length === 0"
     >
-      <option value="" disabled>Choisir une interface…</option>
+      <option value="" disabled>Choose an interface…</option>
       <option
         v-for="iface in netInterfaces"
         :key="iface.name"
@@ -20,7 +20,7 @@
 
     <div v-if="selectedInterface" class="iface-details">
       <div class="detail-row" v-if="selectedInterface.desc">
-        <span class="detail-label">Desc</span>
+        <span class="detail-label">Desc.</span>
         <span class="detail-value">{{ selectedInterface.desc }}</span>
       </div>
       <div class="detail-row" v-if="selectedInterface.addresses?.length">
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="detail-row row-status">
-        <span class="detail-label">Statut</span>
+        <span class="detail-label">Status</span>
         <span class="status-dot" :class="getStatusClass(selectedInterface.flags.connection_status)"></span>
         <span class="detail-value">{{ getStatusText(selectedInterface.flags.connection_status) }}</span>
       </div>
@@ -64,10 +64,10 @@ const formatInterfaceDisplay = (iface: NetDevice) =>
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case 'Connected': return 'Connecté'
-    case 'Disconnected': return 'Déconnecté'
+    case 'Connected': return 'Connected'
+    case 'Disconnected': return 'Disconnected'
     case 'NotApplicable': return 'N/A'
-    default: return 'Inconnu'
+    default: return 'Unknown'
   }
 }
 const getStatusClass = (status: string) => {

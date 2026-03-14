@@ -40,7 +40,7 @@
                 <rect x="1.5" y="1.5" width="11" height="11" rx="2"/>
                 <path d="M4 7h6M4 4.5h4M4 9.5h3"/>
               </svg>
-              Résolution — accorder les droits réseau au binaire
+              Resolution — grant network rights to the binary
             </div>
             <div class="cap-command-wrap">
               <code class="cap-command">{{ capCommand }}</code>
@@ -55,21 +55,21 @@
               </button>
             </div>
             <p class="cap-hint">
-              Sur NixOS : remplacez <code>nom_du_binaire</code> par
-              <code>target/debug/netscan-ai</code> ou le chemin du binaire compilé.
+              On NixOS: replace <code>binary_name</code> with
+              <code>target/debug/netscan-ai</code> or the path to the compiled binary.
             </p>
           </div>
 
           <!-- Raw detail (collapsible) -->
           <details class="err-detail" v-if="detail">
-            <summary>Détail technique</summary>
+            <summary>Technical details</summary>
             <pre>{{ detail }}</pre>
           </details>
         </div>
 
         <!-- Footer -->
         <div class="err-footer">
-          <button class="btn-close" @click="close" ref="closeBtn">Fermer</button>
+          <button class="btn-close" @click="close" ref="closeBtn">Close</button>
         </div>
 
       </div>

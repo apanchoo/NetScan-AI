@@ -3,9 +3,9 @@ import { ref } from 'vue';
 import Capture from '../components/homeVue/Capture.vue';
 import FromPcap from '../components/homeVue/FromPcap.vue';
 
-const showCapture = ref(true); // état pour savoir quel composant est au-dessus
+const showCapture = ref(true); // state to know which component is on top
 
-// Fonction pour basculer entre Capture et FromPcap
+// Function to toggle between Capture and FromPcap
 const toggleView = () => {
   showCapture.value = !showCapture.value;
 };
@@ -14,7 +14,7 @@ const toggleView = () => {
 <template>
   <div class="container">
     <div class="tab" @click="toggleView">
-      <button>{{ showCapture ? "Ouvrir un Pcap" : "Afficher Capture" }}</button>
+      <button>{{ showCapture ? "Open a PCAP" : "Show Capture" }}</button>
     </div>
 
     <transition name="fade">
@@ -23,7 +23,7 @@ const toggleView = () => {
     </transition>
 
     <div class="footer">
-      <span>Version 2.0.0 - Bêta:</span>
+      <span>Version 2.0.0 - Beta:</span>
     </div>
   </div>
 </template>

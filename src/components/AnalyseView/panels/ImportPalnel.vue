@@ -9,9 +9,9 @@
             <path d="M1.5 4.5h4l1.5 2H14v7H1.5V4.5z"/>
             <path d="M1.5 6.5v-3a1 1 0 0 1 1-1h3"/>
           </svg>
-          Importer PCAP
+          Import PCAP
         </div>
-        <button class="close-btn" @click="$emit('update:visible', false)" title="Fermer">
+        <button class="close-btn" @click="$emit('update:visible', false)" title="Close">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <line x1="4" y1="4" x2="12" y2="12"/>
             <line x1="12" y1="4" x2="4" y2="12"/>
@@ -28,7 +28,7 @@
             <path d="M12 3v12M8 11l4 4 4-4"/>
             <path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/>
           </svg>
-          <span>Cliquer pour sélectionner</span>
+          <span>Click to select</span>
           <span class="drop-hint">.pcap · .pcapng · .cap</span>
         </div>
 
@@ -40,7 +40,7 @@
               <path d="M8.5 1v2.5H11"/>
             </svg>
             <span class="file-name" :title="file">{{ basename(file) }}</span>
-            <button class="remove-btn" @click="removeFile(index)" title="Retirer" :disabled="isConverting">
+            <button class="remove-btn" @click="removeFile(index)" title="Remove" :disabled="isConverting">
               <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
                 <line x1="2" y1="2" x2="10" y2="10"/>
                 <line x1="10" y1="2" x2="2" y2="10"/>
@@ -55,7 +55,7 @@
             <line x1="7" y1="2" x2="7" y2="12"/>
             <line x1="2" y1="7" x2="12" y2="7"/>
           </svg>
-          Ajouter des fichiers
+          Add files
         </button>
 
       </div>
@@ -63,14 +63,14 @@
       <!-- Footer -->
       <div class="panel-footer">
         <button class="btn-ghost" @click="clearFiles" :disabled="isConverting || packetFiles.length === 0">
-          Effacer
+          Clear
         </button>
         <button class="btn-primary" @click="convert" :disabled="isConverting || packetFiles.length === 0">
           <span v-if="isConverting" class="spinner"></span>
           <svg v-else viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 7h10M8 3l4 4-4 4"/>
           </svg>
-          {{ isConverting ? 'Chargement…' : 'Ouvrir' }}
+          {{ isConverting ? 'Loading…' : 'Open' }}
         </button>
       </div>
 

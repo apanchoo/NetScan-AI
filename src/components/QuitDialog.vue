@@ -13,12 +13,12 @@
 
         <div class="quit-body">
           <p id="quit-title" class="quit-title">Quitter NetScan-AI ?</p>
-          <p class="quit-sub">Les données non sauvegardées seront perdues.</p>
+          <p class="quit-sub">Unsaved data will be lost.</p>
         </div>
 
         <div class="quit-footer">
-          <button class="btn-cancel" @click="cancel">Annuler</button>
-          <button class="btn-confirm" @click="confirm" ref="confirmBtn">Quitter</button>
+          <button class="btn-cancel" @click="cancel">Cancel</button>
+          <button class="btn-confirm" @click="confirm" ref="confirmBtn">Quit</button>
         </div>
 
       </div>

@@ -2,7 +2,7 @@ import { message, save } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 import { error } from "@tauri-apps/plugin-log";
 
-// Fonction pour sauvegarder en CSV
+// Function to save as CSV
 export async function SaveAsCsv(
   getCurrentDate,
   niveauConfidentialite,
@@ -11,7 +11,7 @@ export async function SaveAsCsv(
   try {
     const filePath = await save({
       filters: [{ name: ".csv", extensions: ["csv"] }],
-      title: "Sauvegarder la matrice de flux",
+      title: "Save the flow matrix",
       defaultPath:
         `${getCurrentDate()}_${niveauConfidentialite}_${installationName}.csv`,
     });
@@ -23,12 +23,12 @@ export async function SaveAsCsv(
       return false; // Annulation ou échec
     }
   } catch (error) {
-    console.error("Erreur lors de la sauvegarde CSV:", error);
+    console.error("Error saving CSV:", error);
     return false;
   }
 }
 
-// Fonction pour sauvegarder en XLSX
+// Function to save as XLSX
 export async function SaveAsXlsx(
   getCurrentDate,
   niveauConfidentialite,
@@ -37,7 +37,7 @@ export async function SaveAsXlsx(
   try {
     const filePath = await save({
       filters: [{ name: ".xlsx", extensions: ["xlsx"] }],
-      title: "Sauvegarder la matrice de flux",
+      title: "Save the flow matrix",
       defaultPath:
         `${getCurrentDate()}_${niveauConfidentialite}_${installationName}.xlsx`,
     });
@@ -49,19 +49,19 @@ export async function SaveAsXlsx(
       return false; // Annulation ou échec
     }
   } catch (error) {
-    console.error("Erreur lors de la sauvegarde XLSX:", error);
+    console.error("Error saving XLSX:", error);
     return false;
   }
 }
 
-// Fonction triggerSave pour gérer la sauvegarde en fonction du format sélectionné
+// Function to trigger save based on selected format
 export async function triggerSave(
   selectedFormat,
   getCurrentDate,
   niveauConfidentialite,
   installationName,
 ) {
-  let saveResult = false; // Variable pour stocker le résultat de la sauvegarde
+  let saveResult = false;
 
   if (selectedFormat === "csv") {
     saveResult = await SaveAsCsv(
@@ -78,13 +78,13 @@ export async function triggerSave(
   }
 
   if (saveResult) {
-    await message("La sauvegarde a été effectuée avec succès.", {
+    await message("Save completed successfully.", {
       title: "Confirmation",
       type: "info",
     });
   } else {
-    await message("Erreur lors de la sauvegarde.", {
-      title: "Erreur",
+    await message("Error saving file.", {
+      title: "Error",
       type: "error",
     });
   }

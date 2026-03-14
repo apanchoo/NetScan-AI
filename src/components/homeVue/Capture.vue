@@ -5,7 +5,7 @@
   <div class="center-container">
     <div class="capture-container">
       <div class="header">
-        <h1 class="title-capture">1. Choisir une interface réseau</h1>
+        <h1 class="title-capture">1. Select a network interface</h1>
       </div>
       <div class="content">
         <select v-model="selectedNetInterface" :class="{ 'invalid': !validation.netInterfaceValid }" @change="validateNetInterface">
@@ -17,7 +17,7 @@
       </div>
 
       <div class="header">
-        <h1 class="title-capture">2. Choisir une confidentialité</h1>
+        <h1 class="title-capture">2. Choose a confidentiality level</h1>
       </div>
       <div class="content">
         <select v-model="confidentialite" :class="{ 'invalid': !validation.confidentialiteValid }" @change="validateConfidentialite">
@@ -29,19 +29,19 @@
       </div>
 
       <div class="header">
-        <h1 class="title-capture">3. Entrer le nom de la matrice</h1>
+        <h1 class="title-capture">3. Enter the matrix name</h1>
       </div>
       <div class="content">
-        <input v-model="installationName" placeholder="Nom de la matrice" :class="{ 'invalid': !validation.installationNameValid }" @input="validateInstallationName" />
+        <input v-model="installationName" placeholder="Matrix name" :class="{ 'invalid': !validation.installationNameValid }" @input="validateInstallationName" />
       </div>
 
       <div class="header">
-        <h1 class="title-capture">4. Entrer la durée de relevé</h1>
+        <h1 class="title-capture">4. Enter the capture duration</h1>
       </div>
       <div class="content">
         <input v-model="time" type="text" step="1" placeholder="HH:MM:SS" :class="{ 'invalid': !validation.timeValid }" @input="validateTime" />
       </div>
-        <button @click="goToAnalysePage">Lancer le relevé</button>
+        <button @click="goToAnalysePage">Start capture</button>
     </div>
   </div>
 </template>
@@ -125,7 +125,7 @@ export default {
         },
       });
     } else {
-      message('Remplissez les champs en rouges ...', { title: 'Champs non remplis', type: 'warning' });
+      message('Please fill in the highlighted fields...', { title: 'Missing fields', type: 'warning' });
     }
   }
   },

@@ -5,18 +5,18 @@
     <div class="bar-left">
 
     <!-- Start -->
-    <button class="image-btn logo-btn" @click="start" title="Démarrer (ctrl+p)" :disabled="isRunning">
-      <img src="/src-tauri/icons/StoreLogo.png" alt="Sonar" class="logo-img" />
+    <button class="image-btn logo-btn" @click="start" title="Start (ctrl+p)" :disabled="isRunning">
+      <img src="/src-tauri/icons/StoreLogo.png" alt="NetScan-AI" class="logo-img" />
       <span v-if="isRecording" class="rec-dot" />
     </button>
 
     <!-- Stop -->
-    <button class="image-btn" @click="stop" title="Arrêter (ctrl+shift+p)" :disabled="!isRunning">
+    <button class="image-btn" @click="stop" title="Stop (ctrl+shift+p)" :disabled="!isRunning">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="3.5" y="3.5" width="9" height="9" rx="1.5"/></svg>
     </button>
 
     <!-- Reset -->
-    <button class="image-btn" @click="reset" title="Réinitialiser (ctrl+shift+r)">
+    <button class="image-btn" @click="reset" title="Reset (ctrl+shift+r)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M13.5 8a5.5 5.5 0 1 1-1.1-3.3"/>
         <path d="M13.5 3v2.5H11"/>
@@ -26,7 +26,7 @@
     <div class="sep"/>
 
     <!-- Config -->
-    <button class="image-btn" title="Config (ctrl+,)" :disabled="isRunning" @click="handleConfigClick">
+    <button class="image-btn" title="Settings (ctrl+,)" :disabled="isRunning" @click="handleConfigClick">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
         <circle cx="8" cy="8" r="2"/>
         <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M11.9 4.1l-.7.7M4.8 11.2l-.7.7"/>
@@ -35,7 +35,7 @@
 
     <!-- Save dropdown (CSV / PNG) -->
     <div class="export-wrap">
-      <button class="image-btn" @click="showSaveMenu = !showSaveMenu" title="Sauvegarder (ctrl+s)">
+      <button class="image-btn" @click="showSaveMenu = !showSaveMenu" title="Save (ctrl+s)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2.5 13.5h11V5l-3-3H2.5v11.5z"/>
           <rect x="5" y="9" width="6" height="4.5" rx="0.5"/>
@@ -44,15 +44,15 @@
       </button>
       <Transition name="menu-fade">
         <div v-if="showSaveMenu" class="export-menu">
-          <button @click="triggerSave">Exporter CSV</button>
-          <button @click="triggerSavePng">Exporter PNG</button>
-          <button @click="triggerSaveSvg">Exporter SVG</button>
+          <button @click="triggerSave">Export CSV</button>
+          <button @click="triggerSavePng">Export PNG</button>
+          <button @click="triggerSaveSvg">Export SVG</button>
         </div>
       </Transition>
     </div>
 
     <!-- Open -->
-    <button class="image-btn" @click="displayPcapOpener" title="Ouvrir (ctrl+o)">
+    <button class="image-btn" @click="displayPcapOpener" title="Open (ctrl+o)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M1.5 4.5h4l1.5 2H14v7H1.5V4.5z"/>
         <path d="M1.5 6.5v-3a1 1 0 0 1 1-1h3"/>
@@ -60,7 +60,7 @@
     </button>
 
     <!-- Logs -->
-    <button class="image-btn" @click="export_logs" title="Logs (ctrl+l)">
+    <button class="image-btn" @click="export_logs" title="Logs (ctrl+l)" >
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
         <rect x="3" y="1.5" width="10" height="13" rx="1"/>
         <line x1="5.5" y1="5" x2="10.5" y2="5"/>
@@ -70,14 +70,14 @@
     </button>
 
     <!-- Filter -->
-    <button class="image-btn" @click="handleFilterClick" title="Filtrer (ctrl+f)">
+    <button class="image-btn" @click="handleFilterClick" title="Filter (ctrl+f)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 3.5h12M4.5 7.5h7M7 11.5h2"/>
       </svg>
     </button>
 
     <!-- AI Chat -->
-    <button class="image-btn" :class="{ 'ai-btn-active': aiPanelOpen }" @click="handleAIClick" title="Assistant IA (ctrl+i)">
+    <button class="image-btn" :class="{ 'ai-btn-active': aiPanelOpen }" @click="handleAIClick" title="AI Assistant (ctrl+i)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="8" cy="6" r="2.5"/>
         <path d="M3 14c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/>
@@ -87,7 +87,7 @@
 
     <!-- Export rules dropdown -->
     <div class="export-wrap">
-      <button class="image-btn" @click="showExportMenu = !showExportMenu" title="Exporter des règles">
+      <button class="image-btn" @click="showExportMenu = !showExportMenu" title="Export rules">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M8 2v8M5 7l3 3 3-3"/>
           <path d="M3 12h10"/>
@@ -106,7 +106,7 @@
     <div class="sep"/>
 
     <!-- Quit -->
-    <button class="image-btn quit-btn" @click="quit" title="Quitter (ctrl+q)">
+    <button class="image-btn quit-btn" @click="quit" title="Quit (ctrl+q)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
         <circle cx="8" cy="8" r="5.5"/>
         <path d="M8 4.5v3.5"/>
@@ -122,12 +122,12 @@
 
     <!-- Window controls: right side -->
     <div class="bar-right">
-      <button class="wm-btn" @click="minimizeWindow" title="Réduire">
+      <button class="wm-btn" @click="minimizeWindow" title="Minimize">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <line x1="3.5" y1="8" x2="12.5" y2="8"/>
         </svg>
       </button>
-      <button class="wm-btn" @click="toggleMaximize" title="Agrandir">
+      <button class="wm-btn" @click="toggleMaximize" title="Maximize">
         <svg v-if="!isMaximized" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3.5" y="3.5" width="9" height="9" rx="1"/>
         </svg>
@@ -136,7 +136,7 @@
           <path d="M4 11V4h7"/>
         </svg>
       </button>
-      <button class="wm-btn wm-close" @click="closeWindow" title="Fermer">
+      <button class="wm-btn wm-close" @click="closeWindow" title="Close">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <line x1="4" y1="4" x2="12" y2="12"/>
           <line x1="12" y1="4" x2="4" y2="12"/>
@@ -165,7 +165,7 @@ import { getCurrentDate } from '../../utils/time';
 import { useCaptureStore } from '../../store/capture';
 import { CaptureEvent } from '../../types/capture';
 
-// Stocké hors de Vue pour éviter que le Proxy réactif ne casse les méthodes Tauri
+// Stored outside Vue to prevent the reactive Proxy from breaking Tauri methods
 let appWindow: ReturnType<typeof getCurrentWebviewWindow> | null = null;
 
 export default {
@@ -265,18 +265,17 @@ export default {
           name: '.log',
           extensions: ['log']
         }],
-        title: 'Sauvegarder les logs',
-        defaultPath: 'sonar.log'
+        title: 'Save logs',
+        defaultPath: 'netscan-ai.log'
       });
 
       if (response) {
-        // Attendez que l'invocation d'API pour sauvegarder soit terminée
         const saveResponse = await invoke('export_logs', { destination: response });
-        info("Sauvegarde terminée:", saveResponse);
-        return saveResponse; // Retourner la réponse pour confirmer que c'est terminé
+        info("Save completed:", saveResponse);
+        return saveResponse;
       } else {
-        info("Aucun chemin de fichier sélectionné");
-        throw new Error("Sauvegarde annulée ou chemin non sélectionné");
+        info("No file path selected");
+        throw new Error("Save cancelled or path not selected");
       }
     },
 
@@ -287,8 +286,8 @@ export default {
           name: '.csv',
           extensions: ['csv']
         }],
-        title: 'Sauvegarder la matrice de flux',
-        defaultPath: getCurrentDate()+ '_DR_Matrice.csv' // Set the default file name here
+        title: 'Save the flow matrix',
+        defaultPath: getCurrentDate()+ '_DR_Matrice.csv'
       
       }).then((response) => 
         invoke('export_csv', { path: response })
@@ -300,28 +299,27 @@ export default {
     },
     async SaveAsXlsx() {
       try {
-        info("Début de la sauvegarde en xlsx");
+        info("Starting xlsx save");
         const response = await save({
           filters: [{
             name: '.xlsx',
             extensions: ['xlsx']
           }],
-          title: 'Sauvegarder la matrice de flux',
+          title: 'Save the flow matrix',
           defaultPath: getCurrentDate() + '_DR_Matrice' + '.xlsx'
         });
 
         if (response) {
-          // Attendez que l'invocation d'API pour sauvegarder soit terminée
           const saveResponse = await invoke('save_packets_to_excel', { file_path: response });
-          info("Sauvegarde terminée:", saveResponse);
-          return saveResponse; // Retourner la réponse pour confirmer que c'est terminé
+          info("Save completed:", saveResponse);
+          return saveResponse;
         } else {
-          info("Aucun chemin de fichier sélectionné");
-          throw new Error("Sauvegarde annulée ou chemin non sélectionné");
+          info("No file path selected");
+          throw new Error("Save cancelled or path not selected");
         }
       } catch (error) {
-        error("Erreur lors de la sauvegarde en xlsx:", error);
-        throw error; // Relancer l'erreur pour la gestion dans quit()
+        error("Error saving to xlsx:", error);
+        throw error;
       }
     },
     async triggerSave() {
@@ -364,7 +362,7 @@ export default {
       this.showSaveMenu = false;
       const path = await save({
         filters: [{ name: 'PCAP', extensions: ['pcap'] }],
-        title: 'Enregistrer en PCAP',
+        title: 'Save as PCAP',
         defaultPath: getCurrentDate() + '_capture.pcap',
       });
       if (!path) return;
@@ -376,7 +374,7 @@ export default {
       this.showSaveMenu = false;
       const path = await invoke<string>('stop_pcap_record').catch((e: any) => { error('stop_pcap_record:', e); return null });
       this.isRecording = false;
-      if (path) info('PCAP enregistré : ' + path);
+      if (path) info('PCAP saved: ' + path);
     },
 
     async exportRules(type: 'snort' | 'suricata' | 'iptables') {
@@ -384,7 +382,7 @@ export default {
       const ext = type === 'iptables' ? 'sh' : 'rules';
       const path = await save({
         filters: [{ name: type, extensions: [ext] }],
-        title: `Exporter règles ${type}`,
+        title: `Export ${type} rules`,
         defaultPath: `${getCurrentDate()}_${type}.${ext}`,
       });
       if (!path) return;
@@ -392,7 +390,7 @@ export default {
                 : type === 'suricata' ? 'export_suricata_rules'
                 : 'export_iptables';
       await invoke(cmd, { path }).catch((e: any) => error(`${cmd}:`, e));
-      info(`Règles ${type} exportées : ${path}`);
+      info(`${type} rules exported: ${path}`);
     },
     async start() {
       if (this.captureStore.isRunning) return;
@@ -400,7 +398,7 @@ export default {
       const dir = await downloadDir().catch(() => '.');
       const pcapPath = `${dir}/${getCurrentDate()}_capture.pcap`;
       await invoke('start_pcap_record', { path: pcapPath })
-        .then(() => { this.isRecording = true; info('Enregistrement PCAP : ' + pcapPath); })
+        .then(() => { this.isRecording = true; info('PCAP recording: ' + pcapPath); })
         .catch((e: any) => error('start_pcap_record:', e));
 
       const onEvent = new Channel<CaptureEvent>();
@@ -409,7 +407,7 @@ export default {
         .then((status) => {
           const typedStatus = status as { is_running: boolean };
           this.captureStore.updateStatus(typedStatus);
-          info('Capture démarrée : ' + this.captureStore.isRunning);
+          info('Capture started: ' + this.captureStore.isRunning);
         })
         .catch(displayCaptureError);
     },
@@ -421,25 +419,25 @@ export default {
         .then((status) => {
           const typedStatus = status as { is_running: boolean };
           this.captureStore.updateStatus(typedStatus);
-          info('Capture arrêtée : ' + this.captureStore.isRunning);
+          info('Capture stopped: ' + this.captureStore.isRunning);
         })
         .catch(displayCaptureError);
 
       if (this.isRecording) {
         await invoke<string>('stop_pcap_record')
-          .then((path) => { this.isRecording = false; info('PCAP enregistré : ' + path); })
+          .then((path) => { this.isRecording = false; info('PCAP saved: ' + path); })
           .catch((e: any) => error('stop_pcap_record:', e));
       }
     },
     toggleView() {
-      info('Vue basculée');
+      info('View toggled');
     },
     async quit() {
-      info('Fermeture demandée');
+      info('Close requested');
       await exit(0);
     },
     toggleConfig() {
-      info('Ouverture panneau config');
+      info('Opening config panel');
     },
 
     async minimizeWindow() {

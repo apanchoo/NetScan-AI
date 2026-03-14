@@ -8,9 +8,9 @@
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 3.5h12M4.5 7.5h7M7 11.5h2"/>
           </svg>
-          Filtre BPF
+          BPF Filter
         </div>
-        <button class="close-btn" @click="$emit('update:visible', false)" title="Fermer">
+        <button class="close-btn" @click="$emit('update:visible', false)" title="Close">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <line x1="4" y1="4" x2="12" y2="12"/>
             <line x1="12" y1="4" x2="4" y2="12"/>
@@ -30,7 +30,7 @@
             <button class="chip" @click="preset('dns')">DNS 53</button>
             <button class="chip" @click="preset('ntp')">NTP 123</button>
             <button class="chip" @click="preset('syn')">TCP SYN</button>
-            <button class="chip" @click="preset('no-arp-ipv6')">Sans ARP/IPv6</button>
+            <button class="chip" @click="preset('no-arp-ipv6')">No ARP/IPv6</button>
           </div>
         </div>
 
@@ -38,23 +38,23 @@
 
         <!-- Layer / Types -->
         <div class="section">
-          <div class="section-label">Couche / Types</div>
+          <div class="section-label">Layer / Types</div>
           <div class="checks">
             <label class="check-row">
               <input type="checkbox" v-model="opt.vlan" />
-              <span>Trafic VLAN (802.1Q)</span>
+              <span>VLAN traffic (802.1Q)</span>
             </label>
             <label class="check-row">
               <input type="checkbox" v-model="opt.onlyIp4" />
-              <span>Uniquement IPv4</span>
+              <span>IPv4 only</span>
             </label>
             <label class="check-row">
               <input type="checkbox" v-model="opt.excludeIpv6" />
-              <span>Exclure IPv6</span>
+              <span>Exclude IPv6</span>
             </label>
             <label class="check-row">
               <input type="checkbox" v-model="opt.excludeArp" />
-              <span>Exclure ARP</span>
+              <span>Exclude ARP</span>
             </label>
           </div>
         </div>
@@ -63,7 +63,7 @@
 
         <!-- Protocols -->
         <div class="section">
-          <div class="section-label">Protocoles <span class="hint-inline">laisser vide = pas de restriction</span></div>
+          <div class="section-label">Protocols <span class="hint-inline">leave empty = no restriction</span></div>
           <div class="checks horizontal">
             <label class="check-row"><input type="checkbox" v-model="proto.tcp"   /><span>TCP</span></label>
             <label class="check-row"><input type="checkbox" v-model="proto.udp"   /><span>UDP</span></label>
@@ -76,27 +76,27 @@
 
         <!-- IP -->
         <div class="section">
-          <div class="section-label">Adresses IP</div>
+          <div class="section-label">IP Addresses</div>
           <div class="field-row">
-            <label>Inclure hôte</label>
+            <label>Include host</label>
             <input v-model="ip.includeHost" placeholder="192.168.1.42" />
           </div>
           <div class="field-row">
-            <label>Exclure hôte</label>
+            <label>Exclude host</label>
             <input v-model="ip.excludeHost" placeholder="192.168.1.4" />
           </div>
           <div class="field-row">
-            <label>Inclure réseau</label>
+            <label>Include net</label>
             <input v-model="ip.includeNet" placeholder="10.0.0.0/8" />
           </div>
           <div class="field-row">
-            <label>Exclure réseau</label>
+            <label>Exclude net</label>
             <input v-model="ip.excludeNet" placeholder="192.168.0.0/16" />
           </div>
           <div class="field-row">
             <label>Direction</label>
             <select v-model="ip.direction">
-              <option value="any">src ou dst</option>
+              <option value="any">src or dst</option>
               <option value="src">src</option>
               <option value="dst">dst</option>
             </select>
@@ -112,21 +112,21 @@
         <div class="section">
           <div class="section-label">Ports <span class="hint-inline">TCP/UDP</span></div>
           <div class="field-row">
-            <label>Inclure</label>
+            <label>Include</label>
             <input v-model="ports.include" placeholder="80,443,22" />
           </div>
           <div class="field-row">
-            <label>Exclure</label>
+            <label>Exclude</label>
             <input v-model="ports.exclude" placeholder="25,21" />
           </div>
           <div class="field-row">
-            <label>Plage</label>
+            <label>Range</label>
             <input v-model="ports.range" placeholder="10000-20000" />
           </div>
           <div class="field-row">
             <label>Direction</label>
             <select v-model="ports.direction">
-              <option value="any">src ou dst</option>
+              <option value="any">src or dst</option>
               <option value="src">src</option>
               <option value="dst">dst</option>
             </select>
@@ -140,12 +140,12 @@
 
         <!-- Preview -->
         <div class="section">
-          <div class="section-label">Aperçu du filtre</div>
+          <div class="section-label">Filter preview</div>
           <textarea
             class="preview-box"
             :value="previewText"
             @input="onPreviewInput"
-            placeholder="Filtre BPF généré…"
+            placeholder="Generated BPF filter…"
             rows="3"
           ></textarea>
           <div class="errors" v-if="globalErrors.length">
@@ -157,12 +157,12 @@
 
       <!-- Footer -->
       <div class="panel-footer">
-        <button class="btn-ghost" @click="resetAll">Réinitialiser</button>
+        <button class="btn-ghost" @click="resetAll">Reset</button>
         <button class="btn-primary" @click="apply" :disabled="!canApply">
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 7h10M8 3l4 4-4 4"/>
           </svg>
-          Appliquer
+          Apply
         </button>
       </div>
 
@@ -203,19 +203,19 @@ export default defineComponent({
       const errs: string[] = [];
       const isIp   = (s: string) => /^(\d{1,3}\.){3}\d{1,3}$/.test(s);
       const isCidr = (s: string) => /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(s);
-      if (this.ip.includeHost && !isIp(this.ip.includeHost))   errs.push(`IP invalide: ${this.ip.includeHost}`);
-      if (this.ip.excludeHost && !isIp(this.ip.excludeHost))   errs.push(`IP invalide: ${this.ip.excludeHost}`);
-      if (this.ip.includeNet  && !isCidr(this.ip.includeNet))  errs.push(`CIDR invalide: ${this.ip.includeNet}`);
-      if (this.ip.excludeNet  && !isCidr(this.ip.excludeNet))  errs.push(`CIDR invalide: ${this.ip.excludeNet}`);
+      if (this.ip.includeHost && !isIp(this.ip.includeHost))   errs.push(`Invalid IP: ${this.ip.includeHost}`);
+      if (this.ip.excludeHost && !isIp(this.ip.excludeHost))   errs.push(`Invalid IP: ${this.ip.excludeHost}`);
+      if (this.ip.includeNet  && !isCidr(this.ip.includeNet))  errs.push(`Invalid CIDR: ${this.ip.includeNet}`);
+      if (this.ip.excludeNet  && !isCidr(this.ip.excludeNet))  errs.push(`Invalid CIDR: ${this.ip.excludeNet}`);
       return errs;
     },
     portErrors(): string[] {
       const errs: string[] = [];
       const isPortList = (s: string) => s.split(",").every(p => /^\s*\d{1,5}\s*$/.test(p) && Number(p) <= 65535);
       const isRange    = (s: string) => /^\s*\d{1,5}\s*-\s*\d{1,5}\s*$/.test(s);
-      if (this.ports.include && !isPortList(this.ports.include)) errs.push("Ports à inclure invalides");
-      if (this.ports.exclude && !isPortList(this.ports.exclude)) errs.push("Ports à exclure invalides");
-      if (this.ports.range   && !isRange(this.ports.range))      errs.push("Plage de ports invalide");
+      if (this.ports.include && !isPortList(this.ports.include)) errs.push("Invalid ports to include");
+      if (this.ports.exclude && !isPortList(this.ports.exclude)) errs.push("Invalid ports to exclude");
+      if (this.ports.range   && !isRange(this.ports.range))      errs.push("Invalid port range");
       return errs;
     },
     globalErrors(): string[] { return [...this.ipErrors, ...this.portErrors]; },

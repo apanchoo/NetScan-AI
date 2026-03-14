@@ -13,10 +13,10 @@
             </svg>
           </div>
           <div>
-            <h1 class="setup-title">Configurer l'IA</h1>
+            <h1 class="setup-title">Configure AI</h1>
             <p class="setup-sub">
-              <span v-if="step === 1">Choisissez le fournisseur que vous souhaitez utiliser.</span>
-              <span v-else>Renseignez les informations d'accès pour <strong>{{ currentProvider?.label }}</strong>.</span>
+              <span v-if="step === 1">Choose the provider you want to use.</span>
+              <span v-else>Enter the credentials for <strong>{{ currentProvider?.label }}</strong>.</span>
             </p>
           </div>
         </div>
@@ -52,7 +52,7 @@
 
           <!-- API key (all except lmstudio) -->
           <div class="cred-field" v-if="needsKey">
-            <label>Clé API</label>
+            <label>API Key</label>
             <div class="key-input-wrap">
               <input
                 :type="showKey ? 'text' : 'password'"
@@ -70,7 +70,7 @@
 
           <!-- Base URL (lmstudio + openai-compatible) -->
           <div class="cred-field" v-if="needsUrl">
-            <label>URL du serveur</label>
+            <label>Server URL</label>
             <input
               type="text"
               v-model="form.baseUrl"
@@ -81,7 +81,7 @@
 
           <!-- Model -->
           <div class="cred-field">
-            <label>Modèle</label>
+            <label>Model</label>
             <div v-if="currentProvider?.models?.length" class="model-select-wrap">
               <select v-model="form.model" class="cred-select">
                 <option v-for="m in currentProvider.models" :key="m.id" :value="m.id">{{ m.label }}</option>
@@ -98,21 +98,21 @@
 
           <!-- LM Studio hint -->
           <p class="cred-hint" v-if="selectedProvider === 'lmstudio'">
-            Lancez LM Studio et activez le serveur local (<code>Developer → Start Server</code>). L'URL doit inclure <code>/v1</code>, ex&nbsp;: <code>http://localhost:1234/v1</code>. Aucune clé API n'est requise.
+            Launch LM Studio and enable the local server (<code>Developer → Start Server</code>). The URL must include <code>/v1</code>, e.g.&nbsp;: <code>http://localhost:1234/v1</code>. No API key required.
           </p>
           <p class="cred-hint" v-else>
-            La clé est stockée localement sur votre machine.
+            The key is stored locally on your machine.
           </p>
 
         </div>
 
         <!-- Footer -->
         <div class="setup-footer">
-          <button class="btn-skip" @click="skip">Configurer plus tard</button>
+          <button class="btn-skip" @click="skip">Configure later</button>
           <div class="footer-right">
-            <button v-if="step === 2" class="btn-back" @click="step = 1">Retour</button>
-            <button v-if="step === 1" class="btn-continue" @click="goToStep2" :disabled="!selectedProvider">Continuer</button>
-            <button v-if="step === 2" class="btn-save" @click="save" :disabled="!canSave">Enregistrer</button>
+            <button v-if="step === 2" class="btn-back" @click="step = 1">Back</button>
+            <button v-if="step === 1" class="btn-continue" @click="goToStep2" :disabled="!selectedProvider">Continue</button>
+            <button v-if="step === 2" class="btn-save" @click="save" :disabled="!canSave">Save</button>
           </div>
         </div>
 
@@ -140,7 +140,7 @@ const PROVIDERS: ProviderDef[] = [
   {
     id: 'anthropic',
     label: 'Anthropic',
-    desc: 'Claude — modèles rapides et précis',
+    desc: 'Claude — fast and accurate models',
     color: '#c97b4b',
     keyPlaceholder: 'sk-ant-…',
     models: [
@@ -164,7 +164,7 @@ const PROVIDERS: ProviderDef[] = [
   {
     id: 'gemini',
     label: 'Google Gemini',
-    desc: 'Gemini 2.0 Flash et 1.5 Pro',
+    desc: 'Gemini 2.0 Flash and 1.5 Pro',
     color: '#4285f4',
     keyPlaceholder: 'AIza…',
     models: [
@@ -176,7 +176,7 @@ const PROVIDERS: ProviderDef[] = [
   {
     id: 'lmstudio',
     label: 'LM Studio',
-    desc: 'Modèles locaux via LM Studio',
+    desc: 'Local models via LM Studio',
     color: '#a78bfa',
     urlPlaceholder: 'http://localhost:1234/v1',
   },
@@ -185,8 +185,8 @@ const PROVIDERS: ProviderDef[] = [
     label: 'Compatible OpenAI',
     desc: 'Ollama, Together AI, Mistral…',
     color: '#6b7280',
-    keyPlaceholder: 'clé API (si requise)',
-    urlPlaceholder: 'https://api.exemple.com',
+    keyPlaceholder: 'API key (if required)',
+    urlPlaceholder: 'https://api.example.com',
   },
 ]
 

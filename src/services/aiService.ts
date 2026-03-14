@@ -39,7 +39,7 @@ interface FlowMatrixRow {
 }
 
 function summarizeFlowMatrix(rows: FlowMatrixRow[], requestedLimit: number): string {
-  if (rows.length === 0) return 'La matrice de flux est vide (aucun trafic capturé).'
+  if (rows.length === 0) return 'The flow matrix is empty (no traffic captured).'
 
   // Aggregate stats
   const totalPackets = rows.reduce((s, r) => s + r.count, 0)
@@ -66,11 +66,11 @@ function summarizeFlowMatrix(rows: FlowMatrixRow[], requestedLimit: number): str
     : `${b} B`
 
   const lines: string[] = [
-    `## Matrice de flux — ${rows.length} flows${rows.length >= requestedLimit ? ` (top ${requestedLimit} par volume)` : ''}`,
-    `Paquets totaux: ${totalPackets} | Volume: ${fmt(totalBytes)} | Hôtes uniques: ${hosts.size}`,
-    `Protocoles: ${topProtocols}`,
+    `## Flow matrix — ${rows.length} flows${rows.length >= requestedLimit ? ` (top ${requestedLimit} by volume)` : ''}`,
+    `Total packets: ${totalPackets} | Volume: ${fmt(totalBytes)} | Unique hosts: ${hosts.size}`,
+    `Protocols: ${topProtocols}`,
     '',
-    '| IP src | IP dst | Proto | Port dst | Paquets | Volume |',
+    '| Src IP | Dst IP | Proto | Dst Port | Packets | Volume |',
     '|--------|--------|-------|----------|---------|--------|',
     ...rows.slice(0, requestedLimit).map(r =>
       `| ${r.ip_source || r.mac_source} | ${r.ip_destination || r.mac_destination} | ${r.application_protocol ?? r.protocol_transport ?? r.protocol_data_link} | ${r.port_destination ?? '-'} | ${r.count} | ${fmt(r.total_bytes)} |`
@@ -183,24 +183,24 @@ async function executeAction(name: string, args: Record<string, any>): Promise<s
 
   switch (name) {
     case 'start_capture': {
-      if (captureStore.isRunning) return 'La capture est déjà en cours.'
+      if (captureStore.isRunning) return 'Capture is already in progress.'
       const onEvent = new Channel<CaptureEvent>()
       captureStore.setChannel(onEvent)
       try {
         const status = await invoke('start_capture', { onEvent }) as { is_running: boolean }
         captureStore.updateStatus(status)
-        return 'Capture démarrée.'
+        return 'Capture started.'
       } catch (err) {
         throw new Error(tauriErrMsg(err))
       }
     }
     case 'stop_capture': {
-      if (!captureStore.isRunning) return 'La capture n\'est pas en cours.'
+      if (!captureStore.isRunning) return 'Capture is not in progress.'
       const onEvent = captureStore.getChannel()
       try {
         const status = await invoke('stop_capture', { onEvent }) as { is_running: boolean }
         captureStore.updateStatus(status)
-        return 'Capture arrêtée.'
+        return 'Capture stopped.'
       } catch (err) {
         throw new Error(tauriErrMsg(err))
       }
@@ -208,7 +208,7 @@ async function executeAction(name: string, args: Record<string, any>): Promise<s
     case 'reset_capture': {
       try {
         await invoke('reset_capture')
-        return 'Données réinitialisées.'
+        return 'Data reset.'
       } catch (err) {
         throw new Error(tauriErrMsg(err))
       }
@@ -226,7 +226,7 @@ async function executeAction(name: string, args: Record<string, any>): Promise<s
           const status = await invoke('start_capture', { onEvent: newChannel }) as { is_running: boolean }
           captureStore.updateStatus(status)
         }
-        return filter ? `Filtre appliqué : "${filter}"` : 'Filtre supprimé.'
+        return filter ? `Filter applied: "${filter}"` : 'Filter removed.'
       } catch (err) {
         throw new Error(tauriErrMsg(err))
       }
@@ -242,23 +242,23 @@ async function executeAction(name: string, args: Record<string, any>): Promise<s
     }
     case 'export_csv': {
       document.dispatchEvent(new CustomEvent('ai-export-csv'))
-      return 'Export CSV déclenché.'
+      return 'CSV export triggered.'
     }
     case 'get_status': {
-      const status = captureStore.isRunning ? 'en cours' : 'arrêtée'
+      const status = captureStore.isRunning ? 'in progress' : 'stopped'
       return `Capture ${status}.`
     }
     default:
-      return `Action inconnue : ${name}`
+      return `Unknown action: ${name}`
   }
 }
 
 // ─── System prompt ──────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `Tu es un assistant intégré à NetScan-AI, un analyseur de trafic réseau.
-Tu aides l'utilisateur à contrôler l'application en langage naturel.
-Tu peux démarrer/arrêter la capture, appliquer des filtres BPF, réinitialiser les données, et exporter les résultats.
-Réponds en français, de façon concise. Si l'utilisateur demande une action, utilise l'outil correspondant.`
+const SYSTEM_PROMPT = `You are an assistant integrated into NetScan-AI, a network traffic analyzer.
+You help the user control the application using natural language.
+You can start/stop capture, apply BPF filters, reset data, and export results.
+Respond in English, concisely. If the user requests an action, use the corresponding tool.`
 
 // ─── Provider implementations ────────────────────────────────────────────────
 
@@ -347,7 +347,7 @@ async function callOpenAI(
       const result = await executeAction(call.function.name, args)
       actions.push({ action: call.function.name, result })
     } catch (err: any) {
-      actions.push({ action: call.function.name, result: `Erreur : ${err?.message ?? tauriErrMsg(err)}` })
+      actions.push({ action: call.function.name, result: `Error: ${err?.message ?? tauriErrMsg(err)}` })
     }
   }
 
@@ -425,6 +425,6 @@ export async function sendMessage(
     case 'openai-compatible':
       return callOpenAI(history, onChunk, store.baseUrl)
     default:
-      throw new Error(`Fournisseur inconnu : ${store.provider}`)
+      throw new Error(`Unknown provider: ${store.provider}`)
   }
 }
