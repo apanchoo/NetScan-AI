@@ -11,6 +11,102 @@ import { invoke } from "@tauri-apps/api/core"
 import { getCurrentDate } from '../../utils/time';
 import LegendComponent from './LegendComponent.vue';
 
+// --- Device Fingerprinting -------------------------------------------------
+const OUI_MAP: Record<string, string> = {
+  // Apple
+  "28:CF:DA": "apple", "A4:5E:60": "apple", "B8:53:AC": "apple", "AC:87:A3": "apple",
+  "8C:85:90": "apple", "F0:D1:A9": "apple", "00:17:F2": "apple", "00:1B:63": "apple",
+  "00:1C:B3": "apple", "00:23:12": "apple", "64:B0:A6": "apple", "D8:BB:2C": "apple",
+  "38:F9:D3": "apple", "18:65:90": "apple", "4C:57:CA": "apple", "A4:D9:31": "apple",
+  "C4:B3:01": "apple", "34:36:3B": "apple", "98:00:C6": "apple", "20:C9:D0": "apple",
+  "A8:20:66": "apple", "3C:07:54": "apple", "00:0A:95": "apple", "00:03:93": "apple",
+  // Cisco (routers/switches)
+  "00:00:0C": "router", "00:01:42": "router", "00:01:64": "router", "00:0B:45": "router",
+  "00:17:0E": "router", "C4:7D:4F": "router", "F8:B7:E2": "router", "00:13:C3": "router",
+  // Ubiquiti
+  "04:18:D6": "router", "18:E8:29": "router", "24:A4:3C": "router", "44:D9:E7": "router",
+  "68:72:51": "router", "74:83:C2": "router", "DC:9F:DB": "router", "F0:9F:C2": "router",
+  // TP-Link
+  "14:CC:20": "router", "50:C7:BF": "router", "A0:F3:C1": "router", "EC:08:6B": "router",
+  "B0:95:8E": "router", "98:DE:D0": "router",
+  // Huawei routers
+  "00:18:82": "router", "0C:37:96": "router", "10:47:80": "router", "3C:5A:37": "router",
+  // Raspberry Pi
+  "B8:27:EB": "linux", "DC:A6:32": "linux", "E4:5F:01": "linux",
+  // Samsung phones/tablets
+  "00:12:47": "phone", "00:15:B9": "phone", "08:FC:88": "phone", "10:30:47": "phone",
+  "18:3F:47": "phone", "24:4B:03": "phone", "40:0E:85": "phone", "60:AF:6D": "phone",
+  "70:F9:27": "phone", "8C:77:12": "phone", "94:35:0A": "phone",
+  // Huawei phones
+  "04:21:9A": "phone", "14:B9:68": "phone", "18:C5:8A": "phone", "28:6E:D4": "phone",
+  // Xiaomi / OnePlus / Google phones
+  "00:9E:C8": "phone", "10:2A:B3": "phone", "28:6C:07": "phone", "64:09:80": "phone",
+  "04:D6:AA": "phone", "3C:5A:B4": "phone", "54:60:09": "phone", "94:EB:2C": "phone",
+  // Dell PCs
+  "00:14:22": "computer", "00:1A:4B": "computer", "00:21:70": "computer",
+  "18:03:73": "computer", "B8:CA:3A": "computer", "F8:DB:88": "computer",
+  // HP PCs
+  "00:01:E6": "computer", "00:08:02": "computer", "3C:D9:2B": "computer",
+  "78:AC:C0": "computer", "94:57:A5": "computer", "E8:39:35": "computer",
+  // HP Printers
+  "00:0A:57": "printer", "00:0E:7F": "printer", "00:17:A4": "printer",
+  "00:18:71": "printer", "1C:C1:DE": "printer",
+  // Canon / Epson / Brother printers
+  "00:00:85": "printer", "00:1E:8F": "printer",
+  "00:00:48": "printer", "AC:18:26": "printer",
+  "00:80:77": "printer", "00:1B:A9": "printer",
+  // VMware / VirtualBox
+  "00:0C:29": "vm", "00:50:56": "vm", "00:05:69": "vm", "08:00:27": "vm",
+  // Microsoft
+  "00:03:FF": "windows", "00:0D:3A": "windows", "00:12:5A": "windows",
+  "00:17:FA": "windows", "28:18:78": "windows", "48:50:73": "windows",
+  "7C:1E:52": "windows",
+  // Intel / Lenovo / generic PC
+  "00:0C:F1": "computer", "00:0E:35": "computer", "00:1B:21": "computer",
+  "8C:EC:4B": "computer", "00:1E:67": "computer", "54:EE:75": "computer",
+  "84:7B:EB": "computer",
+}
+
+const DEVICE_TYPE_LABELS: Record<string, string> = {
+  router:   "Routeur / Switch",
+  server:   "Serveur",
+  computer: "Ordinateur / PC",
+  phone:    "Mobile / Tablette",
+  apple:    "Appareil Apple",
+  windows:  "PC Windows",
+  linux:    "Linux / Raspberry Pi",
+  printer:  "Imprimante",
+  vm:       "Machine virtuelle",
+  internet: "Internet",
+  unknown:  "Inconnu",
+}
+
+function isPrivateIp(ip: string): boolean {
+  return /^10\./.test(ip)
+    || /^172\.(1[6-9]|2\d|3[01])\./.test(ip)
+    || /^192\.168\./.test(ip)
+    || /^127\./.test(ip)
+    || /^169\.254\./.test(ip)
+    || /^::1$/.test(ip)
+    || /^fc/.test(ip)
+    || /^fd/.test(ip)
+}
+
+function detectDeviceType(node: { mac?: string; ip?: string; name?: string }): string {
+  const mac = (node.mac || "").toUpperCase()
+  if (mac.length >= 8) {
+    const oui = mac.slice(0, 8)
+    if (OUI_MAP[oui]) return OUI_MAP[oui]
+  }
+  const ip = node.ip || node.name || ""
+  if (ip) {
+    const last = ip.split(".").pop() || ""
+    if (last === "1" || last === "254") return "router"
+    if (!isPrivateIp(ip) && /^\d+\.\d+\.\d+\.\d+$/.test(ip)) return "internet"
+  }
+  return "server"
+}
+
 // --- Colors ----------------------------------------------------------------
 const EDGE_COLORS_LC: Record<string, string> = Object.freeze({
   arp: "#a89040",
@@ -203,7 +299,9 @@ export default defineComponent({
       selectedNode: null as NodeData | null,
       selectedNodeId: null as string | null,
       editedLabel: "" as string,
+      editedDeviceType: "" as string,
       isSavingLabel: false as boolean,
+      deviceTypeLabels: DEVICE_TYPE_LABELS,
 
       // Queue
       _queue: [] as GraphUpdate[],
@@ -212,6 +310,8 @@ export default defineComponent({
 
       // Handlers pour cleanup
       resetHandler: null as (() => void) | null,
+      _exportPngHandler: null as (() => void) | null,
+      _exportSvgHandler: null as (() => void) | null,
     }
   },
 
@@ -231,6 +331,11 @@ export default defineComponent({
   mounted() {
     clearReactiveMap(this.graphData.nodes)
     clearReactiveMap(this.graphData.edges)
+
+    this._exportPngHandler = () => this.downloadPng()
+    document.addEventListener('export-png', this._exportPngHandler)
+    this._exportSvgHandler = () => this.downloadSvg()
+    document.addEventListener('export-svg', this._exportSvgHandler)
 
     this.captureStore.onGraphUpdate((update: GraphUpdate) => {
       this._queue.push(update)
@@ -252,6 +357,11 @@ export default defineComponent({
     this.$bus?.on?.('reset', this.resetHandler)
 
     if (this.forceEnabled && isFn(this.forceLayout, "start")) this.forceLayout.start()
+  },
+
+  beforeUnmount() {
+    if (this._exportPngHandler) document.removeEventListener('export-png', this._exportPngHandler)
+    if (this._exportSvgHandler) document.removeEventListener('export-svg', this._exportSvgHandler)
   },
 
   methods: {
@@ -311,6 +421,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
           ip: node.ip || "",
           color,
           label: node.label || "",
+          deviceType: detectDeviceType({ mac: node.mac, ip: node.ip, name: node.name || id }),
           _stroke: darken(color, 0.25),
           _hover: brighten(color, 0.18),
         };
@@ -386,6 +497,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       this.selectedNodeId = node
       this.selectedNode = n
       this.editedLabel = n.label ?? ""
+      this.editedDeviceType = n.deviceType ?? ""
       this.selectedNodeInfos = this._buildNodeInfos(node)
     },
     clearNodeInfos() {
@@ -393,13 +505,17 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       this.selectedNode = null
       this.selectedNodeId = null
       this.editedLabel = ""
+      this.editedDeviceType = ""
     },
     async editNodeLabel() {
       if (!this.selectedNode || !this.selectedNodeId) return
       const newLabel = String(this.editedLabel ?? "").trim()
+      const newDeviceType = this.editedDeviceType || undefined
 
-      // MAJ UI immédiate
-      this.selectedNode.label = newLabel
+      // Remplacer le nœud entier pour déclencher shallowReactive
+      const updated: NodeData = { ...this.selectedNode, label: newLabel, deviceType: newDeviceType }
+      this.graphData.nodes[this.selectedNodeId] = updated
+      this.selectedNode = updated
       this.configs.node.label.text = (node: NodeData) => node.label || node.name
       this.selectedNodeInfos = this._buildNodeInfos(this.selectedNodeId)
 
@@ -428,6 +544,10 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       }
     },
 
+    getDeviceType(node: any): string {
+      return node?.deviceType || "unknown"
+    },
+
     // === Bandeau infos =====================================================
     _buildNodeInfos(nodeId: string): string[] {
       const n = this.graphData.nodes[nodeId] as any
@@ -443,12 +563,16 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
         }
       }
 
+      const dtype = n.deviceType || "unknown"
+      const dtypeLabel = DEVICE_TYPE_LABELS[dtype] ?? dtype
+
       return [
         `ID: ${n.id}`,
         `Nom: ${n.name ?? ""}`,
         `Label: ${n.label ?? "N/A"}`,
+        `Type: ${dtypeLabel}`,
         `MAC: ${n.mac ?? ""}`,
-        `IP: ${n.ip ?? ""}`,            // ← NEW (affichage)
+        `IP: ${n.ip ?? ""}`,
         `Couleur: ${n.color}`,
         `Degré: ${degree}`,
         `Protocoles: ${[...protos].join(", ") || "—"}`,
@@ -472,7 +596,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
     async downloadSvg() {
         const filePath = await save({
           filters: [{ name: "SVG File", extensions: ["svg"] }],
-          defaultPath: getCurrentDate()+ "_network_graph_DR_Matrice.svg",
+          defaultPath: getCurrentDate()+ "_network_graph.svg",
         })
         if (!filePath) return
         const vng = (this.$refs as any).graphnodes
@@ -483,7 +607,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       async downloadPng() {
       const filePath = await save({
         filters: [{ name: "PNG File", extensions: ["png"] }],
-        defaultPath: getCurrentDate()+ "_network_graph_DR_Matrice.png",
+        defaultPath: getCurrentDate()+ "_network_graph.png",
       })
       if (!filePath) return
 
@@ -534,9 +658,10 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
               id: node.id,
               name: node.name,
               mac: node.mac || "",
-              ip: node.ip || "",          // ← NEW (propagation)
+              ip: node.ip || "",
               color,
               label: node.label || "",
+              deviceType: detectDeviceType({ mac: node.mac, ip: node.ip, name: node.name }),
               _stroke: darken(color, 0.25),
               _hover: brighten(color, 0.18),
             }
@@ -574,14 +699,6 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
 <template>
   <div class="graph-container">
     <div class="graph-controls">
-      <!-- Export PNG -->
-      <button class="graph-btn" @click="downloadPng" title="Exporter en PNG">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 2v8M5 7l3 3 3-3"/>
-          <path d="M3 12h10"/>
-        </svg>
-      </button>
-
       <!-- Gravité toggle -->
       <button
         class="graph-btn"
@@ -608,6 +725,105 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       :configs="configs"
       :event-handlers="eventHandlers"
     >
+      <template #override-node="{ nodeId, scale }">
+        <!-- Outer colored ring (private=blue/green, public=orange) -->
+        <circle
+          :r="20 * scale"
+          :fill="graphNodes[nodeId]?.color ?? '#4a6aa0'"
+          :stroke="graphNodes[nodeId]?._stroke ?? '#2a3a60'"
+          :stroke-width="3 * scale"
+        />
+        <!-- Dark inner fill -->
+        <circle :r="15 * scale" fill="#1a1a26" />
+        <!-- Device icon -->
+        <g :transform="`scale(${scale * 0.9})`" fill="#b8b8d0" stroke="#b8b8d0"
+           stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <!-- router -->
+          <template v-if="getDeviceType(graphNodes[nodeId]) === 'router'">
+            <rect x="-7" y="1" width="14" height="5" rx="1.5" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <circle cx="-4" cy="3.5" r="1" fill="#b8b8d0" stroke="none"/>
+            <circle cx="-1" cy="3.5" r="1" fill="#b8b8d0" stroke="none"/>
+            <line x1="-4" y1="1" x2="-5" y2="-5" stroke="#b8b8d0"/>
+            <line x1="0" y1="1" x2="0" y2="-6" stroke="#b8b8d0"/>
+            <line x1="4" y1="1" x2="5" y2="-5" stroke="#b8b8d0"/>
+            <circle cx="-5.5" cy="-5.5" r="1.2" fill="#b8b8d0" stroke="none"/>
+            <circle cx="0" cy="-6.5" r="1.2" fill="#b8b8d0" stroke="none"/>
+            <circle cx="5.5" cy="-5.5" r="1.2" fill="#b8b8d0" stroke="none"/>
+          </template>
+          <!-- server -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'server'">
+            <rect x="-7" y="-6.5" width="14" height="3.5" rx="1" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <rect x="-7" y="-1.5" width="14" height="3.5" rx="1" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <rect x="-7" y="3.5" width="14" height="3.5" rx="1" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <circle cx="5" cy="-4.75" r="1" fill="#b8b8d0" stroke="none"/>
+            <circle cx="5" cy="0.25" r="1" fill="#b8b8d0" stroke="none"/>
+            <circle cx="5" cy="5.25" r="1" fill="#b8b8d0" stroke="none"/>
+          </template>
+          <!-- computer -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'computer'">
+            <rect x="-7" y="-7" width="14" height="9" rx="1" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <line x1="-7" y1="-2" x2="7" y2="-2" stroke="#b8b8d0" stroke-width="0.7" opacity="0.5"/>
+            <rect x="-2" y="2" width="4" height="2.5" rx="0.5" fill="none" stroke="#b8b8d0" stroke-width="1"/>
+            <line x1="-5" y1="7" x2="5" y2="7" stroke="#b8b8d0" stroke-width="1.6" stroke-linecap="round"/>
+          </template>
+          <!-- phone -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'phone'">
+            <rect x="-4.5" y="-8" width="9" height="15" rx="2" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <circle cx="0" cy="5" r="1.3" fill="#b8b8d0" stroke="none"/>
+            <line x1="-1.5" y1="-6.5" x2="1.5" y2="-6.5" stroke="#b8b8d0" stroke-width="1.3" stroke-linecap="round"/>
+          </template>
+          <!-- apple -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'apple'">
+            <path d="M1.5,-9.5 C2.5,-11 4,-10.5 4,-9" fill="none" stroke="#b8b8d0" stroke-width="1.2"/>
+            <path d="M-0.5,-7 C-4.5,-6 -6,-1 -5,3.5 C-4,7 -2,8.5 0,8.5 C2,8.5 3.5,7 3.5,7 C3.5,7 5,8.5 7,7.5 C9,5.5 8,-1 4,-6 C2.5,-7.5 0.5,-7 -0.5,-7 Z" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <path d="M0,-7.5 C0,-9.5 2,-10 2,-8" fill="none" stroke="#b8b8d0" stroke-width="1.2"/>
+          </template>
+          <!-- windows -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'windows'">
+            <rect x="-7.5" y="-7.5" width="6.5" height="6.5" rx="0.5" fill="#b8b8d0" stroke="none" opacity="0.9"/>
+            <rect x="1" y="-7.5" width="6.5" height="6.5" rx="0.5" fill="#b8b8d0" stroke="none" opacity="0.7"/>
+            <rect x="-7.5" y="1" width="6.5" height="6.5" rx="0.5" fill="#b8b8d0" stroke="none" opacity="0.6"/>
+            <rect x="1" y="1" width="6.5" height="6.5" rx="0.5" fill="#b8b8d0" stroke="none" opacity="0.85"/>
+          </template>
+          <!-- linux / raspberry pi -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'linux'">
+            <ellipse cx="0" cy="-2.5" rx="5" ry="6" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <circle cx="-2" cy="-4" r="1.2" fill="#b8b8d0" stroke="none"/>
+            <circle cx="2" cy="-4" r="1.2" fill="#b8b8d0" stroke="none"/>
+            <path d="M-2.5,0 C-1,1.5 1,1.5 2.5,0" fill="none" stroke="#b8b8d0" stroke-width="1.1"/>
+            <path d="M-4,3.5 L-5.5,8 L-0.5,6" fill="none" stroke="#b8b8d0" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M4,3.5 L5.5,8 L0.5,6" fill="none" stroke="#b8b8d0" stroke-width="1.3" stroke-linejoin="round"/>
+          </template>
+          <!-- printer -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'printer'">
+            <rect x="-5.5" y="-8" width="11" height="4.5" rx="1" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <rect x="-7" y="-3.5" width="14" height="8" rx="1.5" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <rect x="-3.5" y="1" width="7" height="6" rx="0.5" fill="none" stroke="#b8b8d0" stroke-width="1"/>
+            <circle cx="4.5" cy="0.5" r="1" fill="#b8b8d0" stroke="none"/>
+          </template>
+          <!-- vm -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'vm'">
+            <rect x="-7" y="-7" width="14" height="14" rx="1.5" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <rect x="-4" y="-4" width="8" height="8" rx="1" fill="none" stroke="#b8b8d0" stroke-width="1" stroke-dasharray="2,1.5"/>
+            <text x="0" y="2.5" text-anchor="middle" font-size="4.5" fill="#b8b8d0" stroke="none" font-weight="bold" font-family="monospace">VM</text>
+          </template>
+          <!-- internet / globe -->
+          <template v-else-if="getDeviceType(graphNodes[nodeId]) === 'internet'">
+            <circle cx="0" cy="0" r="7.5" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <ellipse cx="0" cy="0" rx="4" ry="7.5" fill="none" stroke="#b8b8d0" stroke-width="1"/>
+            <line x1="-7.5" y1="0" x2="7.5" y2="0" stroke="#b8b8d0" stroke-width="1"/>
+            <line x1="-6" y1="-4" x2="6" y2="-4" stroke="#b8b8d0" stroke-width="0.8"/>
+            <line x1="-6" y1="4" x2="6" y2="4" stroke="#b8b8d0" stroke-width="0.8"/>
+          </template>
+          <!-- unknown (default) -->
+          <template v-else>
+            <circle cx="0" cy="-2" r="3.5" fill="none" stroke="#b8b8d0" stroke-width="1.3"/>
+            <text x="0" y="1.5" text-anchor="middle" font-size="5" fill="#b8b8d0" stroke="none" font-weight="bold" font-family="sans-serif">?</text>
+            <circle cx="0" cy="5.5" r="1.3" fill="#b8b8d0" stroke="none"/>
+          </template>
+        </g>
+      </template>
+
       <template #edge-label="slotProps">
         <v-edge-label
           v-if="zoomLevel >= 1.2"
@@ -656,7 +872,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
       <div class="node-infos" v-if="selectedNodeInfos.length">
         <strong>Nœud sélectionné</strong>
 
-        <!-- Édition du label -->
+        <!-- Édition du label et du type -->
         <div class="edit-row">
           <label for="labelInput">Label :</label>
           <input
@@ -666,6 +882,10 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
             placeholder="Entrer un label…"
             @keydown="onEditKeydown"
           />
+          <label for="deviceTypeSelect">Type :</label>
+          <select id="deviceTypeSelect" v-model="editedDeviceType" class="device-select">
+            <option v-for="(label, value) in deviceTypeLabels" :key="value" :value="value">{{ label }}</option>
+          </select>
           <button
             class="primary"
             :disabled="isSavingLabel || !selectedNode"
@@ -821,7 +1041,30 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
   border: 1px solid #545465;
   border-radius: 6px;
   padding: 6px 8px;
-  min-width: 220px;
+  min-width: 180px;
+}
+.device-select {
+  background: #343448;
+  color: #d4d4d8;
+  border: 1px solid #545465;
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888894'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}
+.device-select:focus {
+  outline: none;
+  border-color: #3a5a80;
+}
+.device-select option {
+  background: #2a2a3a;
+  color: #d4d4d8;
 }
 button.primary {
   background: #2e4a68;
