@@ -44,6 +44,7 @@ ouroboros = "0.18.5"
 
 libc = "0.2.182"
 tauri-plugin-fs = "2"
+reqwest = { version = "0.13", default-features = false, features = ["json"] }
 
 csv = "1.4.0"
 dirs = "6.0.0"

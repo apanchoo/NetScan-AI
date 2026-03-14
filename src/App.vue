@@ -7,6 +7,7 @@
     @cancel="onQuitCancel"
   />
   <ErrorDialog />
+  <AISetupDialog :visible="showAISetup" @done="showAISetup = false" />
 </template>
 
 <style>
@@ -51,21 +52,29 @@ import { exit } from '@tauri-apps/plugin-process';
 import { info } from '@tauri-apps/plugin-log';
 import QuitDialog from './components/QuitDialog.vue';
 import ErrorDialog from './components/ErrorDialog.vue';
+import AISetupDialog from './components/AISetupDialog.vue';
+import { useAIStore } from './store/ai';
 
 const appWindow = getCurrentWebviewWindow()
 
 export default {
-  components: { QuitDialog, ErrorDialog },
+  components: { QuitDialog, ErrorDialog, AISetupDialog },
 
   data() {
     return {
       unlistenCloseEvent: null,
       showQuitDialog: false,
       pendingCloseEvent: null,
+      showAISetup: false,
     };
   },
 
   async mounted() {
+    const aiStore = useAIStore();
+    if (!aiStore.configured) {
+      this.showAISetup = true;
+    }
+
     this.unlistenCloseEvent = await appWindow.onCloseRequested(async (event) => {
       info("close requested")
       event.preventDefault();

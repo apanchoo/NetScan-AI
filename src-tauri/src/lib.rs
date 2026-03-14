@@ -12,8 +12,9 @@ use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut,
 
 use crate::{
     commandes::{
+        ai_proxy::ai_request,
         export::{csv::export_csv, logs::export_logs},
-        flow_matrix::{add_label, get_label_list},
+        flow_matrix::{add_label, get_flow_matrix, get_label_list},
         import::convert_from_pcap_list,
         net_capture::{reset_capture, set_filter, start_capture_core},
     },
@@ -32,8 +33,23 @@ mod setup;
 mod state;
 mod utils;
 
+#[cfg(target_os = "linux")]
+fn set_wayland_app_id() {
+    let id = std::ffi::CString::new("io.netscanai.app").unwrap();
+    unsafe extern "C" {
+        fn g_set_prgname(name: *const libc::c_char);
+        fn gdk_set_program_class(name: *const libc::c_char);
+    }
+    unsafe {
+        g_set_prgname(id.as_ptr());
+        gdk_set_program_class(id.as_ptr());
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), tauri::Error> {
+    #[cfg(target_os = "linux")]
+    set_wayland_app_id();
     let now = Local::now();
     let filename = format!(
         "DR_SONAR_{}_{}",
@@ -116,7 +132,7 @@ pub fn run() -> Result<(), tauri::Error> {
                         "main",
                         tauri::WebviewUrl::App("index.html".into()),
                     )
-                    .title("SONAR")
+                    .title("NetScan-AI")
                     .inner_size(1800.0, 950.0)
                     .decorations(false)
                     .build()?;
@@ -141,8 +157,10 @@ pub fn run() -> Result<(), tauri::Error> {
             export_logs,
             convert_from_pcap_list,
             add_label,
+            get_flow_matrix,
             get_label_list,
-            set_filter
+            set_filter,
+            ai_request
         ])
         .run(tauri::generate_context!())
 }

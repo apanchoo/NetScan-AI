@@ -173,7 +173,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { invoke, Channel } from "@tauri-apps/api/core";
-import { useCaptureStore } from "../../../store/capture";
+import { useCaptureStore, useCaptureConfigStore } from "../../../store/capture";
 import type { CaptureEvent } from "../../../types/capture";
 
 type Dir = "any" | "src" | "dst";
@@ -260,12 +260,23 @@ export default defineComponent({
 
     canApply(): boolean { return this.globalErrors.length === 0; },
     captureStore() { return useCaptureStore(); },
+    configStore() { return useCaptureConfigStore(); },
+    activeFilter() { return useCaptureConfigStore().activeFilter; },
   },
 
   watch: {
     autoPreview: {
       immediate: true,
       handler(v: string) { if (!this.isManualPreview) this.previewText = v; },
+    },
+    activeFilter: {
+      immediate: true,
+      handler(v: string) {
+        if (v) {
+          this.previewText = v;
+          this.isManualPreview = true;
+        }
+      },
     },
   },
 
@@ -275,6 +286,7 @@ export default defineComponent({
       const filter = this.previewText.trim();
       try {
         await invoke("set_filter", { filter });
+        this.configStore.$patch({ activeFilter: filter });
       } catch (e) {
         console.error("set_filter failed:", e);
         return;
@@ -310,6 +322,7 @@ export default defineComponent({
       this.advanced.raw = "";
       this.isManualPreview = false;
       this.previewText = "";
+      this.configStore.$patch({ activeFilter: "" });
     },
     preset(name: string) {
       this.resetAll();

@@ -755,7 +755,7 @@ async loadFromGraphData(snapshot: GraphData | null | undefined) {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 200px;
+  bottom: 0;
   display: flex;
   align-items: center;
   gap: 12px;

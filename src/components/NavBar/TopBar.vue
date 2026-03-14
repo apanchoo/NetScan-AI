@@ -66,6 +66,15 @@
       </svg>
     </button>
 
+    <!-- AI Chat -->
+    <button class="image-btn" :class="{ 'ai-btn-active': aiPanelOpen }" @click="handleAIClick" title="Assistant IA (ctrl+i)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="6" r="2.5"/>
+        <path d="M3 14c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/>
+        <path d="M11.5 4c.8.5 1.5 1.5 1.5 3"/>
+      </svg>
+    </button>
+
     <div class="sep"/>
 
     <!-- Quit -->
@@ -132,7 +141,10 @@ let appWindow: ReturnType<typeof getCurrentWebviewWindow> | null = null;
 
 export default {
   name: "TopBar",
-  emits: ['toggle-config','toggle-pcap','toggle-filter'],
+  emits: ['toggle-config','toggle-pcap','toggle-filter','toggle-ai'],
+  props: {
+    aiPanelOpen: { type: Boolean, default: false },
+  },
 
   computed: {
     buttonText(): string {
@@ -180,6 +192,9 @@ export default {
 
     // Filtre
     this.bindShortcut('CommandOrControl+F', () => this.handleFilterClick());
+
+    // IA
+    this.bindShortcut('CommandOrControl+I', () => this.handleAIClick());
 
     // Logs
     this.bindShortcut('CommandOrControl+L', () => this.export_logs());
@@ -296,6 +311,10 @@ export default {
     handleFilterClick() {
       info("[TopBar] Bouton filter cliqué");
       this.$emit('toggle-filter');
+    },
+    handleAIClick() {
+      info("[TopBar] Bouton IA cliqué");
+      this.$emit('toggle-ai');
     },
     async start() {
       if (this.captureStore.isRunning) {
@@ -499,5 +518,14 @@ export default {
   background: #3c3c50;
   margin: 0 2px;
   flex-shrink: 0;
+}
+
+.ai-btn-active {
+  color: #8080d0;
+  background-color: #2e2e4a;
+}
+.ai-btn-active:hover {
+  color: #a0a0e8;
+  background-color: #35355a;
 }
 </style>
