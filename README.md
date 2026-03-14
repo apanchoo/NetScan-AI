@@ -14,7 +14,7 @@
 <!-- LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/Sonar-team/Sonar_desktop_app">
+  <a href="https://github.com/apanchoo/NetScan-AI">
     <img src="src-tauri/icons/icon.png" alt="NetScan-AI Logo" width="120" height="120">
   </a>
 
@@ -25,9 +25,9 @@
     Capture traffic, visualize flows, and control the app in natural language.
     <br />
     <br />
-    <a href="https://github.com/Sonar-team/Sonar_desktop_app/issues/new?labels=bug">Report Bug</a>
+    <a href="https://github.com/apanchoo/NetScan-AI/issues/new?labels=bug">Report Bug</a>
     &nbsp;·&nbsp;
-    <a href="https://github.com/Sonar-team/Sonar_desktop_app/issues/new?labels=enhancement">Request Feature</a>
+    <a href="https://github.com/apanchoo/NetScan-AI/issues/new?labels=enhancement">Request Feature</a>
   </p>
 </div>
 
@@ -234,7 +234,7 @@ Distributed under the **AGPL-3.0** License. See [`LICENSE.md`](LICENSE.md) for m
 <!-- CONTACT -->
 ## Contact
 
-Project Link: [https://github.com/Sonar-team/Sonar_desktop_app][repo-url]
+Project Link: [https://github.com/apanchoo/NetScan-AI][repo-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -254,17 +254,17 @@ Project Link: [https://github.com/Sonar-team/Sonar_desktop_app][repo-url]
 ---
 
 <!-- REFERENCE-STYLE LINKS & BADGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
-[contributors-url]: https://github.com/Sonar-team/Sonar_desktop_app/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
-[forks-url]: https://github.com/Sonar-team/Sonar_desktop_app/network/members
-[stars-shield]: https://img.shields.io/github/stars/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
-[stars-url]: https://github.com/Sonar-team/Sonar_desktop_app/stargazers
-[issues-shield]: https://img.shields.io/github/issues/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
-[issues-url]: https://github.com/Sonar-team/Sonar_desktop_app/issues
-[license-shield]: https://img.shields.io/github/license/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
-[license-url]: https://github.com/Sonar-team/Sonar_desktop_app/blob/main/LICENSE.md
-[repo-url]: https://github.com/Sonar-team/Sonar_desktop_app
+[contributors-shield]: https://img.shields.io/github/contributors/apanchoo/NetScan-AI.svg?style=for-the-badge
+[contributors-url]: https://github.com/apanchoo/NetScan-AI/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/apanchoo/NetScan-AI.svg?style=for-the-badge
+[forks-url]: https://github.com/apanchoo/NetScan-AI/network/members
+[stars-shield]: https://img.shields.io/github/stars/apanchoo/NetScan-AI.svg?style=for-the-badge
+[stars-url]: https://github.com/apanchoo/NetScan-AI/stargazers
+[issues-shield]: https://img.shields.io/github/issues/apanchoo/NetScan-AI.svg?style=for-the-badge
+[issues-url]: https://github.com/apanchoo/NetScan-AI/issues
+[license-shield]: https://img.shields.io/github/license/apanchoo/NetScan-AI.svg?style=for-the-badge
+[license-url]: https://github.com/apanchoo/NetScan-AI/blob/main/LICENSE.md
+[repo-url]: https://github.com/apanchoo/NetScan-AI
 [sonar-url]: https://github.com/Sonar-team/Sonar_desktop_app
 
 [Tauri-badge]: https://img.shields.io/badge/Tauri-24C8DB?style=for-the-badge&logo=tauri&logoColor=white
