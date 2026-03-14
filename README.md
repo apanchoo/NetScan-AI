@@ -1,151 +1,280 @@
-<p align="center">
-  <img src="src-tauri/icons/icon.png" alt="NetScan-AI Logo" width="120" />
-</p>
+<a name="readme-top"></a>
 
-<h1 align="center">NetScan-AI</h1>
+<!-- SHIELDS -->
+<div align="center">
 
-<p align="center">
-  Fork of <a href="https://github.com/Sonar-team/Sonar_desktop_app">Sonar</a> — AI-powered network traffic analyzer built with Rust and Tauri.<br/>
-  Captures network traffic, generates flow matrices, and lets you control the app in natural language via an integrated AI assistant.
-</p>
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![AGPL-3.0 License][license-shield]][license-url]
+
+</div>
+
+<!-- LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/Sonar-team/Sonar_desktop_app">
+    <img src="src-tauri/icons/icon.png" alt="NetScan-AI Logo" width="120" height="120">
+  </a>
+
+  <h3 align="center">NetScan-AI</h3>
+
+  <p align="center">
+    AI-powered network traffic analyzer built with Rust and Tauri.<br/>
+    Capture traffic, visualize flows, and control the app in natural language.
+    <br />
+    <br />
+    <a href="https://github.com/Sonar-team/Sonar_desktop_app/issues/new?labels=bug">Report Bug</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/Sonar-team/Sonar_desktop_app/issues/new?labels=enhancement">Request Feature</a>
+  </p>
+</div>
 
 ---
 
-## About this fork
-
-This project is a fork of [Sonar](https://github.com/Sonar-team/Sonar_desktop_app), an open-source desktop app for network traffic capture and flow matrix generation.
-
-The goal of NetScan-AI is to build on top of Sonar's solid capture engine and add AI capabilities:
-
-- **Natural language control** — start/stop capture, apply BPF filters, export data, and query traffic using plain language ✅
-- **Flow matrix analysis** — ask the AI to summarize hosts, protocols, and anomalies in captured traffic ✅
-- **Anomaly detection** — flag unusual traffic patterns automatically *(planned)*
-- **Traffic classification** — identify applications and protocols with ML models *(planned)*
-- **Flow prediction** — anticipate network behaviour over time *(planned)*
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#built-with">Built With</a></li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
 ---
 
-## Features
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+NetScan-AI is a fork of [Sonar][sonar-url], an open-source desktop application for network traffic capture and flow matrix generation. It extends Sonar's solid capture engine with an integrated AI assistant and an interactive network graph.
+
+**Key features:**
 
 ### AI Assistant
-
-- **Integrated chat panel** — VS Code-style sidebar (toggle with `Ctrl+I`), open by default
-- **Multi-provider support** — connect to any of:
-  - [Anthropic](https://www.anthropic.com/) (Claude)
-  - [OpenAI](https://platform.openai.com/) (GPT-4o, etc.)
-  - [Google Gemini](https://ai.google.dev/)
-  - [LM Studio](https://lmstudio.ai/) — local models, no API key required
-  - Any OpenAI-compatible endpoint
-- **Tool calling** — the AI can directly:
-  - Start / stop / reset capture
-  - Apply or clear BPF filters
-  - Read and summarize the current flow matrix
-  - Export the flow matrix to CSV
-- **CORS bypass** — HTTP requests to local servers (LM Studio) are routed through a Rust proxy, no browser CORS issues
+- **Integrated chat panel** — VS Code-style sidebar (toggle with `Ctrl+I`)
+- **Multi-provider support** — Anthropic (Claude), OpenAI (GPT-4o), Google Gemini, LM Studio (local, no API key), and any OpenAI-compatible endpoint
+- **Tool calling** — the AI can start/stop/reset capture, apply or clear BPF filters, read and summarize the flow matrix, and export to CSV
+- **CORS bypass** — HTTP calls to local servers are routed through a Rust proxy, so LM Studio works out of the box
 
 ### Network Capture Engine
-
-- Configures the selected network interface in **promiscuous mode**
-- Reconstructs packet metadata in real time and maps traffic relationships
+- Promiscuous-mode capture on the selected interface with real-time flow matrix reconstruction
 - BPF filter builder with preset rules and live preview
 - Import `.pcap` files for offline analysis
-- **PCAP recording** — automatically saves a `.pcap` file to the Downloads folder whenever a capture session is started
-- Supports the following protocols:
-
-  - Ethernet (MAC), VLAN (802.1Q)
-  - IPv4, IPv6, ARP
-  - ICMPv4, ICMPv6
-  - UDP, TCP
-  - HTTP, DNS, TLS, QUIC
+- Automatic PCAP recording to the Downloads folder on session start
+- Protocol support: Ethernet/MAC, VLAN 802.1Q, IPv4, IPv6, ARP, ICMPv4/v6, UDP, TCP, HTTP, DNS, TLS, QUIC
 
 ### Network Graph
-
-- **Force-directed layout** with toggleable gravity
-- **Device fingerprinting** — nodes are automatically identified by MAC OUI and IP heuristics and display a matching icon:
-  - Router / Switch (Cisco, Ubiquiti, TP-Link, Huawei…)
-  - Server
-  - Desktop / PC (Dell, HP, Intel, Lenovo…)
-  - Mobile / Tablet (Samsung, Huawei, Xiaomi, Google…)
-  - Apple device
-  - Windows PC (Microsoft OUI)
-  - Linux / Raspberry Pi
-  - Printer (HP, Canon, Epson, Brother…)
-  - Virtual Machine (VMware, VirtualBox)
-  - Internet (public IPs)
-- **Colored ring** around each node indicates private (blue/green) vs public (orange) address
-- **Manual override** — click a node and change its device type from the dropdown in the info panel
-- Node label editing with backend persistence
-- **Export graph** as PNG (2× scale, white background) or SVG via the Save dropdown in the toolbar
+- Force-directed layout with toggleable gravity
+- **Device fingerprinting** — nodes are auto-identified by MAC OUI and IP heuristics and display a matching icon (Router/Switch, Server, PC, Mobile, Apple, Windows, Linux/RPi, Printer, VM, Internet)
+- Colored ring per node: private vs. public address
+- Manual type override and label editing from the info panel
+- Export graph as PNG or SVG
 
 ### Export & Rules
+- **CSV** — full flow matrix as a spreadsheet
+- **Snort rules** — `.rules` file from captured flows
+- **Suricata rules** — `.rules` file with metadata headers
+- **iptables script** — bash ACCEPT rules for observed traffic
 
-- **CSV export** — full flow matrix as a spreadsheet
-- **Snort rules** — generate `.rules` file from captured flows
-- **Suricata rules** — generate `.rules` file with metadata headers
-- **iptables script** — generate a bash script with ACCEPT rules for observed traffic
-
-### UI
-
-- Dark theme desktop app (Tauri 2 + Vue 3)
-- Real-time packet table with scroll-to-bottom and auto-pause on manual scroll
-- High-performance rendering — packets are batched via `requestAnimationFrame` to avoid UI freeze during high-traffic captures
-- Custom error dialogs with actionable guidance (including `CAP_NET_RAW` fix)
-- VS Code-style AI sidebar that pushes content rather than overlaying it
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
-## System Dependencies
+<!-- BUILT WITH -->
+## Built With
 
-### Linux
+[![Tauri][Tauri-badge]][Tauri-url]
+[![Vue.js][Vue-badge]][Vue-url]
+[![Rust][Rust-badge]][Rust-url]
+[![TypeScript][TypeScript-badge]][TypeScript-url]
 
-- **libpcap-dev** — packet capture library:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-  ```bash
-  sudo apt install libpcap-dev
-  ```
+---
 
-- **Non-root capture** — grant network capabilities to the binary:
+<!-- GETTING STARTED -->
+## Getting Started
 
-  ```bash
-  sudo setcap cap_net_raw,cap_net_admin=eip src-tauri/target/debug/netscan-ai
-  ```
+### Prerequisites
 
-  > Re-run after each recompile.
+Install the system-level packet capture library for your platform.
 
-### NixOS
+#### Linux (Debian / Ubuntu)
 
-A `shell.nix` is provided at the root. It includes `libpcap` and `libcap`.
+```bash
+sudo apt install libpcap-dev
+```
+
+After building, grant network capabilities to the binary (re-run after each recompile):
+
+```bash
+sudo setcap cap_net_raw,cap_net_admin=eip src-tauri/target/debug/netscan-ai
+```
+
+#### NixOS
+
+A `shell.nix` is provided at the repository root — it includes `libpcap` and `libcap`:
 
 ```bash
 nix-shell
 sudo setcap cap_net_raw,cap_net_admin=eip src-tauri/target/debug/netscan-ai
 ```
 
-### Windows
+#### Windows
 
-- **NPcap** — required for packet capture. Also install the **WinPcap Developer Pack**.
-- Add the `/Lib` or `/Lib/x64` folder to the `LIB` environment variable.
+1. Install **[NPcap][npcap-url]** (select "WinPcap API-compatible mode").
+2. Install the **[WinPcap Developer Pack][winpcap-dev-url]**.
+3. Add the `/Lib` or `/Lib/x64` folder to the `LIB` environment variable.
 
-### macOS
+#### macOS
 
-- **libpcap** is included by default. No additional setup required.
-
----
-
-## Development
-
-```bash
-# Install frontend deps
-npm install
-
-# Run in dev mode
-npm run tauri dev
-```
+`libpcap` is bundled with macOS — no additional setup required.
 
 ---
 
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Sonar-team/Sonar_desktop_app.git
+   cd Sonar_desktop_app
+   ```
+
+2. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the app in development mode:
+   ```bash
+   npm run tauri dev
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- USAGE -->
+## Usage
+
+1. **Select a network interface** from the dropdown in the capture panel.
+2. **Start capture** — click the ▶ button or ask the AI: *"Start capture"*.
+3. **Watch the graph** — nodes and edges appear as traffic flows are detected. Hover a node to see its fingerprinted device type.
+4. **Ask the AI** — open the sidebar (`Ctrl+I`) and type in natural language:
+   - *"What hosts are communicating the most?"*
+   - *"Apply a filter for TCP port 443"*
+   - *"Export the flow matrix to CSV"*
+5. **Build a BPF filter** — click the Filter button for a guided builder with presets.
+6. **Export rules** — use the toolbar dropdown to generate Snort, Suricata, or iptables rules from the captured flows.
+7. **Import a PCAP** — use the Import panel to load an existing `.pcap` file for offline analysis.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- ROADMAP -->
+## Roadmap
+
+- [x] Multi-provider AI assistant (Anthropic, OpenAI, Gemini, LM Studio)
+- [x] AI tool calling (start/stop capture, BPF filters, flow matrix query, CSV export)
+- [x] Force-directed network graph with device fingerprinting
+- [x] BPF filter builder
+- [x] Snort / Suricata / iptables rule export
+- [x] PCAP import and automatic recording
+- [ ] Anomaly detection — flag unusual traffic patterns automatically
+- [ ] Traffic classification — identify applications with ML models
+- [ ] Flow prediction — anticipate network behaviour over time
+
+See the [open issues][issues-url] for a full list of proposed features and known bugs.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would improve this project, please fork the repository and create a pull request. You can also open an issue with the label `enhancement`.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- LICENSE -->
 ## License
 
-AGPL-3.0 — see [LICENSE.md](LICENSE.md).
+Distributed under the **AGPL-3.0** License. See [`LICENSE.md`](LICENSE.md) for more information.
 
-This project is a fork of [Sonar](https://github.com/Sonar-team/Sonar_desktop_app) by the Sonar team.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- CONTACT -->
+## Contact
+
+Project Link: [https://github.com/Sonar-team/Sonar_desktop_app][repo-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* [Sonar][sonar-url] — the upstream project this fork is based on
+* [Tauri][Tauri-url] — the framework that makes cross-platform Rust + web UI possible
+* [v-network-graph](https://dash14.github.io/v-network-graph/) — force-directed graph component for Vue
+* [libpcap](https://www.tcpdump.org/) / [NPcap][npcap-url] — packet capture libraries
+* [Best-README-Template](https://github.com/othneildrew/Best-README-Template) — README structure
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<!-- REFERENCE-STYLE LINKS & BADGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
+[contributors-url]: https://github.com/Sonar-team/Sonar_desktop_app/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
+[forks-url]: https://github.com/Sonar-team/Sonar_desktop_app/network/members
+[stars-shield]: https://img.shields.io/github/stars/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
+[stars-url]: https://github.com/Sonar-team/Sonar_desktop_app/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
+[issues-url]: https://github.com/Sonar-team/Sonar_desktop_app/issues
+[license-shield]: https://img.shields.io/github/license/Sonar-team/Sonar_desktop_app.svg?style=for-the-badge
+[license-url]: https://github.com/Sonar-team/Sonar_desktop_app/blob/main/LICENSE.md
+[repo-url]: https://github.com/Sonar-team/Sonar_desktop_app
+[sonar-url]: https://github.com/Sonar-team/Sonar_desktop_app
+
+[Tauri-badge]: https://img.shields.io/badge/Tauri-24C8DB?style=for-the-badge&logo=tauri&logoColor=white
+[Tauri-url]: https://tauri.app/
+[Vue-badge]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[Rust-badge]: https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white
+[Rust-url]: https://www.rust-lang.org/
+[TypeScript-badge]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
+[TypeScript-url]: https://www.typescriptlang.org/
+
+[npcap-url]: https://npcap.com/
+[winpcap-dev-url]: https://www.winpcap.org/devel.htm
