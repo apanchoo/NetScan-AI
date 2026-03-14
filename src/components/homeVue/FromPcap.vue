@@ -1,7 +1,7 @@
 <template>
     <div class="container">
       <div class="image-container">
-        <img src="../../assets/images/128x128@2x.png" alt="Sonar Logo" width="150" height="150">
+        <img src="../../assets/images/128x128@2x.png" alt="NetScan-AI Logo" width="150" height="150">
       </div>
   
       <div class="center-container">
