@@ -49,6 +49,7 @@ The goal of NetScan-AI is to build on top of Sonar's solid capture engine and ad
 - Reconstructs packet metadata in real time and maps traffic relationships
 - BPF filter builder with preset rules and live preview
 - Import `.pcap` files for offline analysis
+- **PCAP recording** — automatically saves a `.pcap` file to the Downloads folder whenever a capture session is started
 - Supports the following protocols:
 
   - Ethernet (MAC), VLAN (802.1Q)
@@ -57,12 +58,38 @@ The goal of NetScan-AI is to build on top of Sonar's solid capture engine and ad
   - UDP, TCP
   - HTTP, DNS, TLS, QUIC
 
+### Network Graph
+
+- **Force-directed layout** with toggleable gravity
+- **Device fingerprinting** — nodes are automatically identified by MAC OUI and IP heuristics and display a matching icon:
+  - Router / Switch (Cisco, Ubiquiti, TP-Link, Huawei…)
+  - Server
+  - Desktop / PC (Dell, HP, Intel, Lenovo…)
+  - Mobile / Tablet (Samsung, Huawei, Xiaomi, Google…)
+  - Apple device
+  - Windows PC (Microsoft OUI)
+  - Linux / Raspberry Pi
+  - Printer (HP, Canon, Epson, Brother…)
+  - Virtual Machine (VMware, VirtualBox)
+  - Internet (public IPs)
+- **Colored ring** around each node indicates private (blue/green) vs public (orange) address
+- **Manual override** — click a node and change its device type from the dropdown in the info panel
+- Node label editing with backend persistence
+- **Export graph** as PNG (2× scale, white background) or SVG via the Save dropdown in the toolbar
+
+### Export & Rules
+
+- **CSV export** — full flow matrix as a spreadsheet
+- **Snort rules** — generate `.rules` file from captured flows
+- **Suricata rules** — generate `.rules` file with metadata headers
+- **iptables script** — generate a bash script with ACCEPT rules for observed traffic
+
 ### UI
 
 - Dark theme desktop app (Tauri 2 + Vue 3)
-- Network graph visualisation with node inspection and label editing
-- Real-time packet table
-- Custom error dialogs with actionable guidance (including CAP\_NET\_RAW fix)
+- Real-time packet table with scroll-to-bottom and auto-pause on manual scroll
+- High-performance rendering — packets are batched via `requestAnimationFrame` to avoid UI freeze during high-traffic captures
+- Custom error dialogs with actionable guidance (including `CAP_NET_RAW` fix)
 - VS Code-style AI sidebar that pushes content rather than overlaying it
 
 ---

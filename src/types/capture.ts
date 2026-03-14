@@ -75,9 +75,10 @@ export interface NodeData {
   id: string
   name: string
   mac?: string
-  ip?: string      // ← NEW
+  ip?: string
   color: string
   label?: string
+  deviceType?: string
   _hover?: string
   _stroke?: string
 }
