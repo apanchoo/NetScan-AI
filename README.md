@@ -6,7 +6,7 @@
 
 <p align="center">
   Fork of <a href="https://github.com/Sonar-team/Sonar_desktop_app">Sonar</a> — AI-powered network traffic analyzer built with Rust and Tauri.<br/>
-  Captures network traffic, generates flow matrices, and lays the groundwork for AI-driven anomaly detection.
+  Captures network traffic, generates flow matrices, and lets you control the app in natural language via an integrated AI assistant.
 </p>
 
 ---
@@ -17,16 +17,31 @@ This project is a fork of [Sonar](https://github.com/Sonar-team/Sonar_desktop_ap
 
 The goal of NetScan-AI is to build on top of Sonar's solid capture engine and add AI capabilities:
 
-- **Anomaly detection** — flag unusual traffic patterns automatically
-- **Traffic classification** — identify applications and protocols with ML models
-- **Flow prediction** — anticipate network behaviour over time
-- **Natural language queries** — filter and explore captures using plain language
-
-This is a work in progress. Contributions and ideas are welcome.
+- **Natural language control** — start/stop capture, apply BPF filters, export data, and query traffic using plain language ✅
+- **Flow matrix analysis** — ask the AI to summarize hosts, protocols, and anomalies in captured traffic ✅
+- **Anomaly detection** — flag unusual traffic patterns automatically *(planned)*
+- **Traffic classification** — identify applications and protocols with ML models *(planned)*
+- **Flow prediction** — anticipate network behaviour over time *(planned)*
 
 ---
 
 ## Features
+
+### AI Assistant
+
+- **Integrated chat panel** — VS Code-style sidebar (toggle with `Ctrl+I`), open by default
+- **Multi-provider support** — connect to any of:
+  - [Anthropic](https://www.anthropic.com/) (Claude)
+  - [OpenAI](https://platform.openai.com/) (GPT-4o, etc.)
+  - [Google Gemini](https://ai.google.dev/)
+  - [LM Studio](https://lmstudio.ai/) — local models, no API key required
+  - Any OpenAI-compatible endpoint
+- **Tool calling** — the AI can directly:
+  - Start / stop / reset capture
+  - Apply or clear BPF filters
+  - Read and summarize the current flow matrix
+  - Export the flow matrix to CSV
+- **CORS bypass** — HTTP requests to local servers (LM Studio) are routed through a Rust proxy, no browser CORS issues
 
 ### Network Capture Engine
 
@@ -45,9 +60,10 @@ This is a work in progress. Contributions and ideas are welcome.
 ### UI
 
 - Dark theme desktop app (Tauri 2 + Vue 3)
-- Network graph visualisation with node inspection
+- Network graph visualisation with node inspection and label editing
 - Real-time packet table
 - Custom error dialogs with actionable guidance (including CAP\_NET\_RAW fix)
+- VS Code-style AI sidebar that pushes content rather than overlaying it
 
 ---
 
