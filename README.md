@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src-tauri/icons/Square310x310Logo.png" alt="NetScan-AI Logo" width="120" />
+  <img src="src-tauri/icons/icon.png" alt="NetScan-AI Logo" width="120" />
 </p>
 
 <h1 align="center">NetScan-AI</h1>
