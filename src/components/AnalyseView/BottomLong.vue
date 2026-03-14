@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="table-wrapper">
     <table class="trames">
       <thead>
         <tr>
@@ -17,7 +17,7 @@
           <th>Heure</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody ref="tbodyEl">
         <tr v-for="(packet, index) in safePackets" :key="index">
           <td>{{ packet?.flow?.source_mac ?? '-' }}</td>
           <td>{{ packet?.flow?.destination_mac ?? '-' }}</td>
@@ -48,8 +48,14 @@ export default defineComponent({
       packets: [] as PacketMinimal[],
       offPacket: null as null | (() => void),
       resetHandler: null as null | (() => void),
-      MAX_ROWS: 5, // ajuste si besoin
+      MAX_ROWS: 500,
+      autoScroll: true,
     }
+  },
+  watch: {
+    safePackets() {
+      this.$nextTick(() => this.scrollToBottom())
+    },
   },
   computed: {
     captureStore() {
@@ -69,9 +75,17 @@ export default defineComponent({
       // garde une taille raisonnable même en interne
       if (this.packets.length > 200) this.packets.shift()
     }
-    // Si ton store renvoie une fonction d’unsubscribe, garde-la
     const maybeOff = this.captureStore.onPacket(onPacket)
-    if (typeof maybeOff === 'function') this.offPacket = maybeOff
+    if (typeof maybeOff === ‘function’) this.offPacket = maybeOff
+
+    // Pause auto-scroll si l’utilisateur remonte
+    const tbody = this.$refs.tbodyEl as HTMLElement | undefined
+    if (tbody) {
+      tbody.addEventListener(‘scroll’, () => {
+        const atBottom = tbody.scrollHeight - tbody.scrollTop - tbody.clientHeight < 32
+        this.autoScroll = atBottom
+      })
+    }
 
     // Handler reset conservé pour off() symétrique si nécessaire
     const reset = () => { this.packets = [] }
@@ -90,6 +104,11 @@ export default defineComponent({
     }
   },
   methods: {
+    scrollToBottom() {
+      if (!this.autoScroll) return
+      const tbody = this.$refs.tbodyEl as HTMLElement | undefined
+      if (tbody) tbody.scrollTop = tbody.scrollHeight
+    },
     formatTimestamp(sec?: number, usec?: number): string {
       if (typeof sec !== 'number' || typeof usec !== 'number') return '-'
       const date = new Date(sec * 1000 + Math.floor(usec / 1000))
@@ -112,19 +131,48 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.trames {
-  display: block;
+.table-wrapper {
   height: 190px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   background-color: #2c2c3a;
-  font-family: 'Courier New', Courier, monospace;
   border-top: 1px solid #383850;
+  overflow: hidden;
 }
-table {
+
+.trames {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  font-family: 'Courier New', Courier, monospace;
 }
+
+thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  flex-shrink: 0;
+}
+
+tbody {
+  display: block;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  animation: row-in 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 td, th {
   padding: 6px 8px;
   text-align: center;
@@ -135,24 +183,25 @@ td, th {
   text-overflow: ellipsis;
   font-size: 11px;
 }
+
 th {
   color: #687888;
   font-weight: 500;
 }
-tbody {
-  display: block;
-  overflow-y: auto;
+
+tbody::-webkit-scrollbar {
+  width: 4px;
 }
-tbody tr {
-  animation: row-in 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+tbody::-webkit-scrollbar-track {
+  background: #23232f;
 }
+tbody::-webkit-scrollbar-thumb {
+  background: #3c3c50;
+  border-radius: 2px;
+}
+
 @keyframes row-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-thead, tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
 }
 </style>
